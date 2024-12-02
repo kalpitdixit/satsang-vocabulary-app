@@ -2,19 +2,11 @@ import flet as ft
 
 
 
-def old_main(page: ft.Page):
-    page.title = "Hello World Flet App"
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    
-    page.add(
-        ft.Text("Hello, GitHub Pages!", size=30, color=ft.colors.BLUE)
-    )
-
 class FlashCardApp(ft.Column):
-    def __init__(self, vocab):
+    def __init__(self, vocab, page_props):
         super().__init__()
         self.vocab = vocab
+        self.page_props = page_props
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
 
@@ -36,8 +28,8 @@ class FlashCardApp(ft.Column):
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.AMBER_200,
-                    width="50vw",
-                    height="50vh",
+                    width=self.page_props["width"] * 0.5, # "50vw",
+                    height=self.page_props["height"] * 0.4, # "50vh",
                     border_radius=10,
                     ink=True,
                     on_click=self.show_meaning,
@@ -57,12 +49,32 @@ class FlashCardApp(ft.Column):
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
-                    width="50vw",
-                    height="50vh",
+                    width=self.page_props["width"] * 0.5, # "50vw",
+                    height=self.page_props["height"] * 0.4, # "50vh",
                     border_radius=10,
                     ink=True,
-                    on_click=self.show_next_word,
-                )
+                    #on_click=self.show_next_word,
+                ),
+                ft.ElevatedButton(
+                    "I knew this word",
+                    width=self.page_props["width"] * 0.5, # "50vw",
+                    height=self.page_props["height"] * 0.05, # "50vh",
+                    bgcolor=ft.colors.GREEN_100,
+                    icon="check_rounded",
+                    icon_color="green500",
+                    color=ft.colors.GREEN_500,
+                    on_click=self.show_next_word
+                ),
+                ft.ElevatedButton(
+                    "I didn't know this word",
+                    width=self.page_props["width"] * 0.5, # "50vw",
+                    height=self.page_props["height"] * 0.05, # "50vh",
+                    bgcolor=ft.colors.RED_100,
+                    icon="cancel_rounded",
+                    icon_color="red500",
+                    color=ft.colors.RED_500,
+                    on_click=self.show_next_word
+                ),
         ]
         self.update()
         """
@@ -93,7 +105,9 @@ def main(page: ft.Page):
     keys = list(vocab.keys())
 
     # create application instance
-    flashcard_app = FlashCardApp(vocab)
+    page_props = {"width" : page.window.width,
+                  "height" : page.window.height}
+    flashcard_app = FlashCardApp(vocab, page_props)
 
     # add application's root control to the page
     page.add(flashcard_app)
