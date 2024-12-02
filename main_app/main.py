@@ -3,10 +3,10 @@ import flet as ft
 
 
 class FlashCardApp(ft.Column):
-    def __init__(self, vocab): #, page_props):
+    def __init__(self, vocab, page_props):
         super().__init__()
         self.vocab = vocab
-        #self.page_props = page_props
+        self.page_props = page_props
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
 
@@ -28,8 +28,8 @@ class FlashCardApp(ft.Column):
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.AMBER_200,
-                    width="50vw", # self.page_props["width"] * 0.5, # "50vw",
-                    height="50vh", # self.page_props["height"] * 0.4, # "50vh",
+                    width=self.page_props["width"] * 0.5, # "50vw",
+                    height=self.page_props["height"] * 0.4, # "50vh",
                     border_radius=10,
                     ink=True,
                     on_click=self.show_meaning,
@@ -49,10 +49,8 @@ class FlashCardApp(ft.Column):
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
-                    #width=self.page_props["width"] * 0.5, # "50vw",
-                    #height=self.page_props["height"] * 0.4, # "50vh",
-                    width="50vw", # self.page_props["width"] * 0.5, # "50vw",
-                    height="50vh", # self.page_props["height"] * 0.4, # "50vh",
+                    width=self.page_props["width"] * 0.5, # "50vw",
+                    height=self.page_props["height"] * 0.4, # "50vh",
                     border_radius=10,
                     ink=True,
                     on_click=self.show_next_word,
@@ -111,9 +109,9 @@ def main(page: ft.Page):
     keys = list(vocab.keys())
 
     # create application instance
-    #page_props = {"width" : page.window.width,
-    #              "height" : page.window.height}
-    flashcard_app = FlashCardApp(vocab) #, page_props)
+    page_props = {"width" : page.width,
+                  "height" : page.height}
+    flashcard_app = FlashCardApp(vocab, page_props)
 
     # add application's root control to the page
     page.add(flashcard_app)
