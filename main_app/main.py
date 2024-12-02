@@ -139,7 +139,7 @@ class FlashCardApp(ft.Column):
                 ),
         ]
 
-        self.controls.extend(self.get_progress_bar_controls(e))
+        #self.controls.extend(self.get_progress_bar_controls(e))
 
         if not self.first_display:
             self.update()
@@ -180,7 +180,7 @@ class FlashCardApp(ft.Column):
                 ),
         ]
 
-        self.controls.extend(self.get_progress_bar_controls(e))
+        #self.controls.extend(self.get_progress_bar_controls(e))
         self.update()
 
     def get_progress_bar_controls(self, e):
@@ -228,7 +228,6 @@ class FlashCardApp(ft.Column):
         # go to next word
         self.show_next_word(e)
 
-                    
 
 
 def main(page: ft.Page):
@@ -243,7 +242,7 @@ def main(page: ft.Page):
              "ક્રુત્રિમ ": ("Krutrim", "Artificial"),
              "નિર્મલ સમલ" : ("Nirmal, Samal", "without-impurities, with-impurities")}
 
-    vocab = dict([(f"{k}  |  {v[0]}", v[1])for k,v in vocab.items()])
+    vocab = dict([(f"{k}  |  {v[0]}", v[1]) for k,v in vocab.items()])
     keys = list(vocab.keys())
 
     # create application instance
