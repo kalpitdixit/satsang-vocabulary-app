@@ -53,8 +53,11 @@ class FlashCardApp(ft.Column):
                     height=self.page_props["height"] * 0.4, # "50vh",
                     border_radius=10,
                     ink=True,
-                    #on_click=self.show_next_word,
-                ),
+                    on_click=self.show_next_word,
+                )
+        ]
+        """
+            ,
                 ft.ElevatedButton(
                     "I knew this word",
                     width=self.page_props["width"] * 0.5, # "50vw",
@@ -76,6 +79,7 @@ class FlashCardApp(ft.Column):
                     on_click=self.show_next_word
                 ),
         ]
+        """
         self.update()
         """
         self.controls = [
