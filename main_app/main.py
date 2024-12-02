@@ -1,6 +1,14 @@
 import flet as ft
 
 
+TEXT_BOX_WIDTH_PERCENTAGE = 75
+TEXT_BOX_HEIGHT_PERCENTAGE = 40
+
+BUTTON_HEIGHT_PERCENTAGE = 5
+
+FONT_SIZE_1 = 30
+FONT_SIZE_2 = 20
+
 
 class FlashCardApp(ft.Column):
     def __init__(self, vocab, page_props):
@@ -23,17 +31,25 @@ class FlashCardApp(ft.Column):
 
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word, size=60),
-                    margin=10,
+                    content=ft.Text(self.curr_word, size=FONT_SIZE_1),
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.AMBER_200,
-                    width=self.page_props["width"] * 0.5, # "50vw",
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * 0.4, # "50vh",
                     border_radius=10,
                     ink=True,
-                    on_click=self.show_meaning,
-                )
+                ),
+                ft.ElevatedButton(
+                    "Click to see meaning",
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
+                    bgcolor=ft.colors.GREY_100,
+                    icon="arrow_right_alt_rounded",
+                    icon_color="grey500",
+                    color=ft.colors.GREY_500,
+                    on_click=self.show_meaning
+                ),
         ]
 
         if not self.first_display:
@@ -44,21 +60,19 @@ class FlashCardApp(ft.Column):
     def show_meaning(self, e):
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word + "\n" + self.vocab[self.curr_word], size=60),
-                    margin=10,
+                    content=ft.Text(self.curr_word + "\n\n" + self.vocab[self.curr_word], size=FONT_SIZE_2),
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
-                    width=self.page_props["width"] * 0.5, # "50vw",
-                    height=self.page_props["height"] * 0.4, # "50vh",
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE / 100, # "50vh",
                     border_radius=10,
                     ink=True,
-                    on_click=self.show_next_word,
                 ),
                 ft.ElevatedButton(
                     "I knew this word",
-                    width=self.page_props["width"] * 0.5, # "50vw",
-                    height=self.page_props["height"] * 0.05, # "50vh",
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
                     bgcolor=ft.colors.GREEN_100,
                     icon="check_rounded",
                     icon_color="green500",
@@ -67,8 +81,8 @@ class FlashCardApp(ft.Column):
                 ),
                 ft.ElevatedButton(
                     "I didn't know this word",
-                    width=self.page_props["width"] * 0.5, # "50vw",
-                    height=self.page_props["height"] * 0.05, # "50vh",
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
                     bgcolor=ft.colors.RED_100,
                     icon="cancel_rounded",
                     icon_color="red500",
@@ -99,8 +113,11 @@ def main(page: ft.Page):
     page.update()
 
     # Dictionary
-    vocab = {"નય" : ("nay", "point of view, dimension"),
-             "અહંકાર" : ("ahankaar", "ego")}
+    vocab = {"રત્નત્રય" : ("ratnatray", "Samyak Darshan (Faith), Samyak Gnaan (Knowledge), Samyak Charitra (Conduct)"),
+             "નય" : ("nay", "point of view, dimension"),
+             "ક્રુત્રિમ ": ("Krutrim", "Artificial"),
+             "નિર્મલ સમલ" : ("Nirmal, Samal", "without-impurities, with-impurities")}
+
     vocab = dict([(f"{k}  |  {v[0]}", v[1])for k,v in vocab.items()])
     keys = list(vocab.keys())
 
