@@ -3,10 +3,10 @@ import flet as ft
 
 
 class FlashCardApp(ft.Column):
-    def __init__(self, vocab, page_props):
+    def __init__(self, vocab): #, page_props):
         super().__init__()
         self.vocab = vocab
-        self.page_props = page_props
+        #self.page_props = page_props
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
 
@@ -111,9 +111,9 @@ def main(page: ft.Page):
     keys = list(vocab.keys())
 
     # create application instance
-    page_props = {"width" : page.window.width,
-                  "height" : page.window.height}
-    flashcard_app = FlashCardApp(vocab, page_props)
+    #page_props = {"width" : page.window.width,
+    #              "height" : page.window.height}
+    flashcard_app = FlashCardApp(vocab) #, page_props)
 
     # add application's root control to the page
     page.add(flashcard_app)
