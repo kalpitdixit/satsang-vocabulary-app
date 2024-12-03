@@ -1,6 +1,4 @@
 import flet as ft
-import numpy as np
-
 
 
 TEXT_BOX_WIDTH_PERCENTAGE = 75
@@ -14,7 +12,6 @@ FONT_SIZE_2 = 20
 
 SPACED_REPETITION_CATEGORIES = ["Unseen", "Learning", "Reviewing", "Mastered"]
 
-
 # 19 and 1 --> total weight = 23 --> prob = 4/23
 # 49 and 1 --> total weight = 53 --> prob = 4/53
 
@@ -26,7 +23,7 @@ class SpacedRepetition:
 
         self.category = "Unseen" # "Unseen", "Learning", "Reviewing", "Mastered"
         self.streak = 0
- 
+
     def update(self, correct):
         """
         correct : bool
@@ -75,7 +72,7 @@ class SpacedRepetition:
         else:
             raise ValueError(f"unknown category : {self.category}")
         return self.category
-            
+
 
 class FlashCardApp(ft.Column):
     def __init__(self, vocab, page_props):
@@ -85,46 +82,16 @@ class FlashCardApp(ft.Column):
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
 
-        self.curr_ind = -1
-
-        # For Spaced Repetition
-        #self.spaced_reps = {"Unseen": [SpacedRepetition(w) for w in self.words],
-        #                    "Learning": [],
-        #                    "Reviewing": [],
-        #                    "Mastered": []}
-
-        # Utility
         self.first_display = True
+        self.curr_ind = -1
+        self.curr_word = self.words[self.curr_ind]
+
         self.show_next_word(None)
 
-    def choose_next_word(self):
-        self.curr_ind = (self.curr_ind + 1) % self.num_words
-        return self.words[self.curr_ind]
-
-        """
-        # Choose Category
-        total_weight = 2 * len(self.spaced_reps["Unseen"]) + \
-                       4 * len(self.spaced_reps["Learning"]) + \
-                       2 * len(self.spaced_reps["Reviewing"]) + \
-                       1 * len(self.spaced_reps["Mastered"])
-        probs = [2 * len(self.spaced_reps["Unseen"]) / total_weight,
-                 4 * len(self.spaced_reps["Learning"]) / total_weight,
-                 2 * len(self.spaced_reps["Reviewing"]) / total_weight,
-                 1 * len(self.spaced_reps["Mastered"]) / total_weight]
-        self.curr_chosen_category = np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
-        self.curr_chosen_category = self.curr_chosen_category[0]
-
-        # Choose Word Within Chosen Category
-        self.curr_spaced_rep_obj_ind = np.random.choice(len(self.spaced_reps[self.curr_chosen_category]))
-        self.curr_spaced_rep_obj = self.spaced_reps[self.curr_chosen_category][0]
-        """
-    
+                    
     def show_next_word(self, e):
-        """
-        self.choose_next_word()
-        self.curr_word = self.curr_spaced_rep_obj.word
-        """
-        self.curr_word = self.choose_next_word()
+        self.curr_ind = (self.curr_ind + 1) % self.num_words
+        self.curr_word = self.words[self.curr_ind]
 
         self.controls = [
                 ft.Container(
@@ -148,8 +115,6 @@ class FlashCardApp(ft.Column):
                     on_click=self.show_meaning
                 ),
         ]
-
-        #self.controls.extend(self.get_progress_bar_controls(e))
 
         if not self.first_display:
             self.update()
@@ -176,7 +141,7 @@ class FlashCardApp(ft.Column):
                     icon="check_rounded",
                     icon_color="green500",
                     color=ft.colors.GREEN_500,
-                    on_click=lambda e: self.update_spaced_repetition(e, True)
+                    on_click=self.show_next_word
                 ),
                 ft.ElevatedButton(
                     "I didn't know this word",
@@ -186,60 +151,11 @@ class FlashCardApp(ft.Column):
                     icon="cancel_rounded",
                     icon_color="red500",
                     color=ft.colors.RED_500,
-                    on_click=lambda e: self.update_spaced_repetition(e, False)
+                    on_click=self.show_next_word
                 ),
         ]
-
-        #self.controls.extend(self.get_progress_bar_controls(e))
         self.update()
 
-    def get_progress_bar_controls(self, e):
-        progress_bar_controls = [
-            # Mastered
-            ft.Text(f"You have mastered {len(self.spaced_reps['Mastered'])} out of {self.num_words} words"),
-            ft.ProgressBar(value=len(self.spaced_reps["Mastered"]) / self.num_words,
-                           width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100,
-                           bar_height=self.page_props["height"] * PROGRESS_BAR_HEIGHT_PERCENTAGE / 100, # "50vh",
-                           border_radius=10,
-                           color="green",
-                           bgcolor="#eeeeee"),
-            
-            # Reviewing
-            ft.Text(f"You are reviewing {len(self.spaced_reps['Reviewing'])} out of {self.num_words} words"),
-            ft.ProgressBar(value=len(self.spaced_reps["Reviewing"]) / self.num_words,
-                           width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100,
-                           bar_height=self.page_props["height"] * PROGRESS_BAR_HEIGHT_PERCENTAGE / 100, # "50vh",
-                           border_radius=10,
-                           color="amber",
-                           bgcolor="#eeeeee"),
-            # Learning
-            ft.Text(f"You are learning {len(self.spaced_reps['Learning'])} out of {self.num_words} words"),
-            ft.ProgressBar(value=len(self.spaced_reps["Learning"]) / self.num_words,
-                           width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100,
-                           bar_height=self.page_props["height"] * PROGRESS_BAR_HEIGHT_PERCENTAGE / 100, # "50vh",
-                           border_radius=10,
-                           color="red",
-                           bgcolor="#eeeeee")
-        ]
-
-        return progress_bar_controls
-
-
-    def update_spaced_repetition(self, e, correct):
-
-        """
-        # remove from previous category
-        self.spaced_reps[self.curr_chosen_category].pop(self.curr_spaced_rep_obj_ind)
-
-        # update this word's category
-        new_category = self.curr_spaced_rep_obj.update(correct)
-    
-        # append to new category's list
-        self.spaced_reps[new_category].append(self.curr_spaced_rep_obj)
-        """
-
-        # go to next word
-        self.show_next_word(e)
 
 
 
@@ -255,7 +171,7 @@ def main(page: ft.Page):
              "ક્રુત્રિમ ": ("Krutrim", "Artificial"),
              "નિર્મલ સમલ" : ("Nirmal, Samal", "without-impurities, with-impurities")}
 
-    vocab = dict([(f"{k}  |  {v[0]}", v[1]) for k,v in vocab.items()])
+    vocab = dict([(f"{k}  |  {v[0]}", v[1])for k,v in vocab.items()])
     keys = list(vocab.keys())
 
     # create application instance
@@ -268,4 +184,3 @@ def main(page: ft.Page):
 
 
 ft.app(target=main)
-
