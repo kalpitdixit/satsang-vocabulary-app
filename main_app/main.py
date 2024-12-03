@@ -108,8 +108,8 @@ class FlashCardApp(ft.Column):
                  1 * len(self.spaced_reps["Mastered"]) / total_weight]
 
         # Choose Category
-        self.curr_chosen_category = np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
-        #self.curr_chosen_category = ["Unseen"] # np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
+        #self.curr_chosen_category = np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
+        self.curr_chosen_category = ["Unseen"] # np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
         self.curr_chosen_category = str(self.curr_chosen_category[0])
 
         # Choose Word Within Chosen Category
