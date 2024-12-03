@@ -15,7 +15,7 @@ git checkout gh-pages-2
 # copy build files
 cd ..
 mv -f * ~/.Trash
-cp -R ../b/web/* .
+cp -fR ../b/web/* .
 
 # remove line from index.html
 head -n 14 index.html > tmp.html
