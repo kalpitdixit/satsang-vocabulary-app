@@ -82,10 +82,16 @@ class FlashCardApp(ft.Column):
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
 
-        self.first_display = True
         self.curr_ind = -1
-        self.curr_word = self.words[self.curr_ind]
 
+        # For Spaced Repetition
+        self.spaced_reps = {"Unseen": [SpacedRepetition(w) for w in self.words],
+                            "Learning": [],
+                            "Reviewing": [],
+                            "Mastered": []}
+
+        # Utility
+        self.first_display = True
         self.show_next_word(None)
 
                     
