@@ -2,7 +2,7 @@
 flet build web
 
 # moves build files out of repo
-rm -rf ../../b
+mv ../../b ~/.Trash
 mv build ../../b
 
 # commit branch main
@@ -14,7 +14,7 @@ git checkout gh-pages-2
 
 # copy build files
 cd ..
-rm -rf *
+mv * ~/.Trash
 cp -R ../b/web/* .
 
 # remove line from index.html
