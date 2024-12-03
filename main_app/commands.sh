@@ -1,5 +1,5 @@
 # build
-#flet build web
+flet build web
 
 # moves build files out of repo
 rm -rf ../../b
