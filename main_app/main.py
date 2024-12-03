@@ -85,17 +85,23 @@ class FlashCardApp(ft.Column):
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
 
+        self.curr_ind = -1
+
         # For Spaced Repetition
-        self.spaced_reps = {"Unseen": [SpacedRepetition(w) for w in self.words],
-                            "Learning": [],
-                            "Reviewing": [],
-                            "Mastered": []}
+        #self.spaced_reps = {"Unseen": [SpacedRepetition(w) for w in self.words],
+        #                    "Learning": [],
+        #                    "Reviewing": [],
+        #                    "Mastered": []}
 
         # Utility
         self.first_display = True
         self.show_next_word(None)
 
     def choose_next_word(self):
+        self.curr_ind = (self.curr_ind + 1) % self.num_words
+        return self.words[self.curr_ind]
+
+        """
         # Choose Category
         total_weight = 2 * len(self.spaced_reps["Unseen"]) + \
                        4 * len(self.spaced_reps["Learning"]) + \
@@ -111,10 +117,14 @@ class FlashCardApp(ft.Column):
         # Choose Word Within Chosen Category
         self.curr_spaced_rep_obj_ind = np.random.choice(len(self.spaced_reps[self.curr_chosen_category]))
         self.curr_spaced_rep_obj = self.spaced_reps[self.curr_chosen_category][0]
+        """
     
     def show_next_word(self, e):
+        """
         self.choose_next_word()
         self.curr_word = self.curr_spaced_rep_obj.word
+        """
+        self.curr_word = self.choose_next_word()
 
         self.controls = [
                 ft.Container(
@@ -216,6 +226,8 @@ class FlashCardApp(ft.Column):
 
 
     def update_spaced_repetition(self, e, correct):
+
+        """
         # remove from previous category
         self.spaced_reps[self.curr_chosen_category].pop(self.curr_spaced_rep_obj_ind)
 
@@ -224,6 +236,7 @@ class FlashCardApp(ft.Column):
     
         # append to new category's list
         self.spaced_reps[new_category].append(self.curr_spaced_rep_obj)
+        """
 
         # go to next word
         self.show_next_word(e)
