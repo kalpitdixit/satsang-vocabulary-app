@@ -1,5 +1,5 @@
 import flet as ft
-import numpy as np
+#import numpy as np
 
 
 TEXT_BOX_WIDTH_PERCENTAGE = 75
@@ -106,13 +106,13 @@ class FlashCardApp(ft.Column):
                  4 * len(self.spaced_reps["Learning"]) / total_weight,
                  2 * len(self.spaced_reps["Reviewing"]) / total_weight,
                  1 * len(self.spaced_reps["Mastered"]) / total_weight]
-        self.curr_chosen_category = np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
+        self.curr_chosen_category = "Unseen" # np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
         self.curr_chosen_category = self.curr_chosen_category[0]
 
         #print("curr_chosen_category", self.curr_chosen_category)
 
         # Choose Word Within Chosen Category
-        self.curr_spaced_rep_obj_ind = np.random.choice(len(self.spaced_reps[self.curr_chosen_category]))
+        self.curr_spaced_rep_obj_ind = 0 # np.random.choice(len(self.spaced_reps[self.curr_chosen_category]))
         self.curr_spaced_rep_obj = self.spaced_reps[self.curr_chosen_category][self.curr_spaced_rep_obj_ind]
         #print("curr_spaced_rep_obj_ind", self.curr_spaced_rep_obj_ind)
         #print("curr_spaced_rep word", self.curr_spaced_rep_obj.word)
