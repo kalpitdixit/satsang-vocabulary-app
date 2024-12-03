@@ -97,10 +97,6 @@ class FlashCardApp(ft.Column):
         self.show_next_word(None)
 
     def choose_next_word(self):
-        self.curr_chosen_category = "Unseen" # np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
-        self.curr_spaced_rep_obj_ind = 0
-        self.curr_spaced_rep_obj = self.spaced_reps[self.curr_chosen_category][self.curr_spaced_rep_obj_ind]
-        """
         # Choose Category
         total_weight = 2 * len(self.spaced_reps["Unseen"]) + \
                        4 * len(self.spaced_reps["Learning"]) + \
@@ -113,14 +109,11 @@ class FlashCardApp(ft.Column):
         self.curr_chosen_category = ["Unseen"] # np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
         self.curr_chosen_category = self.curr_chosen_category[0]
 
-        #print("curr_chosen_category", self.curr_chosen_category)
-
         # Choose Word Within Chosen Category
         self.curr_spaced_rep_obj_ind = 0 # np.random.choice(len(self.spaced_reps[self.curr_chosen_category]))
         self.curr_spaced_rep_obj = self.spaced_reps[self.curr_chosen_category][self.curr_spaced_rep_obj_ind]
         #print("curr_spaced_rep_obj_ind", self.curr_spaced_rep_obj_ind)
         #print("curr_spaced_rep word", self.curr_spaced_rep_obj.word)
-        """
                     
     def show_next_word(self, e):
         self.choose_next_word()
