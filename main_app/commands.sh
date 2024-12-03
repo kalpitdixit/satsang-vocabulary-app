@@ -9,8 +9,8 @@ mv build ../../b
 ga -u
 gc -m "updates"
 
-# checkout branch gh-pages-2
-git checkout gh-pages-2
+# checkout branch gh-pages-3
+git checkout gh-pages-3
 
 # copy build files
 cd ..
@@ -22,7 +22,7 @@ head -n 14 index.html > tmp.html
 tail -n+16 index.html >> tmp.html
 mv -f tmp.html index.html
 
-# commit and push gh-pages-2
+# commit and push gh-pages-3
 ga *
 ga -u
 gc -m "updates"
