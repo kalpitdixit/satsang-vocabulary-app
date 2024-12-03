@@ -1,9 +1,9 @@
 # build
-flet build web
+#flet build web
 
 # moves build files out of repo
-#mv -f ../../b ~/.Trash
-#mv -f build ../../b
+rm -rf ../../b
+mv build ../../b
 
 # commit branch main
 ga -u
@@ -16,7 +16,6 @@ git checkout gh-pages-2
 cd ..
 rm -rf *
 mv build/web/* .
-rm -rf build
 
 # remove line from index.html
 head -n 14 index.html > tmp.html
