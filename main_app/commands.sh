@@ -23,6 +23,7 @@ tail -n+16 index.html >> tmp.html
 mv -f tmp.html index.html
 
 # commit and push gh-pages-2
+ga *
 ga -u
 gc -m "updates"
 git push
