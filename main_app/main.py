@@ -2,13 +2,16 @@ import flet as ft
 import random
 
 TEXT_BOX_WIDTH_PERCENTAGE = 75
-TEXT_BOX_HEIGHT_PERCENTAGE = 40
+TEXT_BOX_HEIGHT_PERCENTAGE_1 = 40
+TEXT_BOX_HEIGHT_PERCENTAGE_2 = 20
+TEXT_BOX_HEIGHT_PERCENTAGE_3 = 10
 
 BUTTON_HEIGHT_PERCENTAGE = 5
 PROGRESS_BAR_HEIGHT_PERCENTAGE = 3
 
 FONT_SIZE_1 = 30
 FONT_SIZE_2 = 20
+FONT_SIZE_3 = 15
 
 SPACED_REPETITION_CATEGORIES = ["Unseen", "Learning", "Reviewing", "Mastered"]
 
@@ -75,6 +78,69 @@ class SpacedRepetition:
 
 
 class FlashCardApp(ft.Column):
+    def __init__(self, page_props):
+        super().__init__()
+    
+        self.page_props = page_props
+
+        # Utility
+        self.first_display = True
+        self.show_all_decks(None)
+
+
+    def show_all_decks(self, e):
+        def get_deck(title):
+            return ft.Column(
+                    spacing=0,
+                    controls=[
+                        ft.Container(
+                            content=ft.Text(title,
+                                            size=FONT_SIZE_2,
+                                            weight=ft.FontWeight.BOLD,
+                                            color=ft.colors.GREY_700),
+                            alignment=ft.alignment.center,
+                            bgcolor=ft.colors.GREY_100,
+                            width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                            height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_2 / 100, # "50vh",
+                            border_radius=0
+                        ),
+                        ft.Container(
+                            content=ft.Text("Practice this deck ⟶",
+                                            size=FONT_SIZE_3,
+                                            weight=ft.FontWeight.BOLD,
+                                            color=ft.colors.GREY_500),
+                            alignment=ft.alignment.center,
+                            bgcolor=ft.colors.GREY_300,
+                            width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                            height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_3 / 100, # "50vh",
+                            border_radius=0
+                        )
+                    ]
+                )         
+
+        self.controls = [
+                ft.Text("Satsang Vocabulary Decks",
+                        size=FONT_SIZE_1,
+                        weight=ft.FontWeight.BOLD,
+                        color=ft.colors.BLACK)
+        ]
+
+        # Add Decks
+        for title in ["Beejam Kram I"]:
+            self.controls.append(get_deck(title)) 
+
+
+        # Utility
+        if not self.first_display:
+            self.update()
+        else:
+            self.first_display = False
+
+
+        
+
+
+class Deck(ft.Column):
     def __init__(self, vocab, page_props):
         super().__init__()
         self.vocab = vocab
@@ -130,7 +196,7 @@ class FlashCardApp(ft.Column):
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.AMBER_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    height=self.page_props["height"] * 0.4, # "50vh",
+                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
                     ink=True,
                 ),
@@ -162,7 +228,7 @@ class FlashCardApp(ft.Column):
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE / 100, # "50vh",
+                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
                     ink=True,
                 ),
@@ -246,10 +312,11 @@ def main(page: ft.Page):
     # create application instance
     page_props = {"width" : page.width,
                   "height" : page.height}
-    flashcard_app = FlashCardApp(vocab, page_props)
+    flashcard_app = FlashCardApp(page_props) # vocab, page_props)
+    deck = Deck(vocab, page_props)
 
     # add application's root control to the page
-    page.add(flashcard_app)
+    page.add(flashcard_app) # deck)
 
 
 ft.app(target=main)
