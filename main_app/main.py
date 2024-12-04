@@ -1,5 +1,7 @@
 import flet as ft
 import random
+from collections import OrderedDict
+
 
 TEXT_BOX_WIDTH_PERCENTAGE = 75
 TEXT_BOX_HEIGHT_PERCENTAGE_1 = 40
@@ -78,10 +80,12 @@ class SpacedRepetition:
 
 
 class FlashCardApp(ft.Column):
-    def __init__(self, page_props):
+    def __init__(self, page, page_props, all_deck_names):
         super().__init__()
     
         self.page_props = page_props
+        self.page = page
+        self.all_deck_names = all_deck_names
 
         # Utility
         self.first_display = True
@@ -90,9 +94,9 @@ class FlashCardApp(ft.Column):
 
     def show_all_decks(self, e):
         def get_deck(title):
+            print("BREB", self.page is None)
             return ft.Column(
-                    spacing=0,
-                    controls=[
+                    [
                         ft.Container(
                             content=ft.Text(title,
                                             size=FONT_SIZE_2,
@@ -113,30 +117,30 @@ class FlashCardApp(ft.Column):
                             bgcolor=ft.colors.GREY_300,
                             width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                             height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_3 / 100, # "50vh",
-                            border_radius=0
+                            border_radius=0,
+                            on_click=lambda x: self.page.go(f"/deck/{title}")
                         )
-                    ]
+                    ],
+                    spacing=0,
                 )         
 
         self.controls = [
                 ft.Text("Satsang Vocabulary Decks",
                         size=FONT_SIZE_1,
                         weight=ft.FontWeight.BOLD,
-                        color=ft.colors.BLACK)
+                        color=ft.colors.BLACK,
+                        text_align=ft.TextAlign.CENTER)
         ]
 
         # Add Decks
-        for title in ["Beejam Kram I"]:
+        for title in self.all_deck_names:
             self.controls.append(get_deck(title)) 
-
 
         # Utility
         if not self.first_display:
             self.update()
         else:
             self.first_display = False
-
-
         
 
 
@@ -151,7 +155,6 @@ class Deck(ft.Column):
         self.curr_ind = -1
 
         # For Spaced Repetition
-        #print(self.words)
         self.spaced_reps = {"Unseen": [SpacedRepetition(w) for w in self.words],
                             "Learning": [],
                             "Reviewing": [],
@@ -181,8 +184,6 @@ class Deck(ft.Column):
         # Choose Word Within Chosen Category
         self.curr_spaced_rep_obj_ind = random.randint(0, len(self.spaced_reps[self.curr_chosen_category])-1)
         self.curr_spaced_rep_obj = self.spaced_reps[self.curr_chosen_category][self.curr_spaced_rep_obj_ind]
-        #print("curr_spaced_rep_obj_ind", self.curr_spaced_rep_obj_ind)
-        #print("curr_spaced_rep word", self.curr_spaced_rep_obj.word)
 
                     
     def show_next_word(self, e):
@@ -264,6 +265,7 @@ class Deck(ft.Column):
                 ft.Text(f"You {text} {len(self.spaced_reps[k])} out of {self.num_words} words"),
                 ft.ProgressBar(
                     value=len(self.spaced_reps[k]) / self.num_words,
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     bar_height=self.page_props["height"] * PROGRESS_BAR_HEIGHT_PERCENTAGE / 100, # "50vh",
                     color=color
                 )
@@ -280,11 +282,9 @@ class Deck(ft.Column):
     def update_spaced_repetition(self, e, correct):
         # remove from previous category
         self.spaced_reps[self.curr_chosen_category].pop(self.curr_spaced_rep_obj_ind)
-        #print("chosen_category", self.curr_chosen_category)
 
         # update this word's category
         new_category = self.curr_spaced_rep_obj.update(correct)
-        #print("new_category", new_category)
 
         # append to new category's list
         self.spaced_reps[new_category].append(self.curr_spaced_rep_obj)
@@ -293,29 +293,72 @@ class Deck(ft.Column):
         self.show_next_word(e)
 
 
-
 def main(page: ft.Page):
-    page.title = "To-Do App"
+    page.title = "Satsang Vocabulary App"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.update()
 
-    # Dictionary
-    vocab = {"રત્નત્રય" : ("ratnatray", "Samyak Darshan (Faith), Samyak Gnaan (Knowledge), Samyak Charitra (Conduct)"),
-             "નય" : ("nay", "point of view, dimension"),
-             "ક્રુત્રિમ ": ("Krutrim", "Artificial"),
-             "નિર્મલ સમલ" : ("Nirmal, Samal", "without-impurities, with-impurities")}
+    # All Decks
+    vocabs = OrderedDict([
+                ("Beejam Kram I", {"રત્નત્રય" : ("ratnatray", "Samyak Darshan (Faith), Samyak Gnaan (Knowledge), Samyak Charitra (Conduct)"),
+                                   "નય" : ("nay", "point of view, dimension"),
+                                   "ક્રુત્રિમ ": ("Krutrim", "Artificial"),
+                                   "નિર્મલ સમલ" : ("Nirmal, Samal", "without-impurities, with-impurities")}),
+                ("Beejam Kram II", {"lorem" : ("ipsum", "dolor sit amet")})
+             ])
 
-    vocab = dict([(f"{k}  |  {v[0]}", v[1])for k,v in vocab.items()])
-    keys = list(vocab.keys())
+    for k,v in vocabs.items():
+        vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
+
+    all_deck_names = list(vocabs.keys()) 
+
+
+    def route_change(route):
+        print("ROUTE CHANGE", route)
+
+        page.views.clear()
+
+        page.views.append(
+            ft.View(
+                "/all_decks",
+                [
+                    flashcard_app,
+                ],
+            )
+        )
+
+        # Show Deck
+        if page.route[:6] == "/deck/":
+            deck_name = page.route[6:]
+            deck = Deck(vocabs[deck_name], page_props)
+            page.views.append(
+                ft.View(
+                    "/deck/{deck_name}",
+                    [
+                        deck,
+                    ],
+                )
+            )
+        page.update()
+
+
+    def view_pop(view):
+        page.views.pop()
+        top_view = page.views[-1]
+        page.go(top_view.route)
 
     # create application instance
     page_props = {"width" : page.width,
                   "height" : page.height}
-    flashcard_app = FlashCardApp(page_props) # vocab, page_props)
-    deck = Deck(vocab, page_props)
+
+    # Objects
+    flashcard_app = FlashCardApp(page, page_props, all_deck_names) # vocab, page_props)
+    #deck = Deck(vocab, page_props)
 
     # add application's root control to the page
+    page.on_route_change = route_change
+    page.on_view_pop = view_pop
     page.add(flashcard_app) # deck)
 
 
