@@ -1,6 +1,5 @@
 import flet as ft
-import numpy as np
-
+import random
 
 TEXT_BOX_WIDTH_PERCENTAGE = 75
 TEXT_BOX_HEIGHT_PERCENTAGE = 40
@@ -96,6 +95,7 @@ class FlashCardApp(ft.Column):
         self.first_display = True
         self.show_next_word(None)
 
+
     def choose_next_word(self):
         # Get Probability Distribution over Categories
         total_weight = 2 * len(self.spaced_reps["Unseen"]) + \
@@ -109,14 +109,15 @@ class FlashCardApp(ft.Column):
 
         # Choose Category
         #self.curr_chosen_category = np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
-        self.curr_chosen_category = ["Unseen"] # np.random.choice(SPACED_REPETITION_CATEGORIES, 1, p=probs)
+        self.curr_chosen_category = random.choices(SPACED_REPETITION_CATEGORIES, k=1, weights=probs)
         self.curr_chosen_category = str(self.curr_chosen_category[0])
 
         # Choose Word Within Chosen Category
-        self.curr_spaced_rep_obj_ind = 0 # np.random.choice(len(self.spaced_reps[self.curr_chosen_category]))
+        self.curr_spaced_rep_obj_ind = random.randint(0, len(self.spaced_reps[self.curr_chosen_category])-1)
         self.curr_spaced_rep_obj = self.spaced_reps[self.curr_chosen_category][self.curr_spaced_rep_obj_ind]
         #print("curr_spaced_rep_obj_ind", self.curr_spaced_rep_obj_ind)
         #print("curr_spaced_rep word", self.curr_spaced_rep_obj.word)
+
                     
     def show_next_word(self, e):
         self.choose_next_word()
@@ -145,10 +146,13 @@ class FlashCardApp(ft.Column):
                 ),
         ]
 
+        self.controls.extend(self.get_progress_bars())
+
         if not self.first_display:
             self.update()
         else:
             self.first_display = False
+
 
     def show_meaning(self, e):
         self.controls = [
@@ -183,7 +187,29 @@ class FlashCardApp(ft.Column):
                     on_click=lambda e: self.update_spaced_repetition(e, False)
                 ),
         ]
+
+        self.controls.extend(self.get_progress_bars())
         self.update()
+
+
+    def get_progress_bars(self):
+        def progress_bar_factory(text, k, color):
+            return [
+                ft.Text(f"You {text} {len(self.spaced_reps[k])} out of {self.num_words} words"),
+                ft.ProgressBar(
+                    value=len(self.spaced_reps[k]) / self.num_words,
+                    bar_height=self.page_props["height"] * PROGRESS_BAR_HEIGHT_PERCENTAGE / 100, # "50vh",
+                    color=color
+                )
+            ]
+
+        progress_bars = []
+        for text,k,color in [("have mastered", "Mastered", ft.colors.GREEN_500),
+                             ("are reviewing", "Reviewing", ft.colors.AMBER_500),
+                             ("are learning", "Learning", ft.colors.RED_500)]:
+            progress_bars.extend(progress_bar_factory(text, k, color))
+        return progress_bars
+
 
     def update_spaced_repetition(self, e, correct):
         # remove from previous category
