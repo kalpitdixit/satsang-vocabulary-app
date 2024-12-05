@@ -80,11 +80,11 @@ class SpacedRepetition:
 
 
 class FlashCardApp(ft.Column):
-    def __init__(self, page, page_props, all_deck_names):
+    def __init__(self, orchestrator, page_props, all_deck_names):
         super().__init__()
     
+        self.orchestrator = orchestrator
         self.page_props = page_props
-        self.page = page
         self.all_deck_names = all_deck_names
 
         # Utility
@@ -118,7 +118,7 @@ class FlashCardApp(ft.Column):
                             width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                             height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_3 / 100, # "50vh",
                             border_radius=0,
-                            on_click=lambda x: self.page.go(f"/deck/{title}")
+                            on_click=lambda x: self.orchestrator.route_to(f"/deck/{title}")
                         )
                     ],
                     spacing=0,
@@ -293,6 +293,85 @@ class Deck(ft.Column):
         self.show_next_word(e)
 
 
+class Orchestrator:
+    def __init__(self, page, vocabs):
+        self.page = page
+        self.vocabs = vocabs
+
+        self.all_deck_names = list(self.vocabs.keys())
+
+        self.page.on_route_change = self.route_change
+        self.page.on_view_pop = self.view_pop
+        self.page.font_family = "RobotoSlab"
+
+        self.page_props = {"width" : page.width,
+                           "height" : page.height}
+    
+        self.state = {} # state
+
+        self.flashcard_app = FlashCardApp(self, self.page_props, self.all_deck_names)
+
+
+    def start(self):
+        self.page.go("/") # goes to route_chage(...)
+
+                            
+    def route_to(self, route):
+        self.page.go(route)
+
+
+    def route_change(self, route):
+        print("ROUTE CHANGE", route)
+
+        self.page.controls.clear()
+
+        # Show All Decks
+        if self.page.route=="/":
+            self.page.views.append(
+                ft.View(
+                    "/all_decks",
+                    [
+                        self.flashcard_app,
+                    ],
+                    bgcolor=ft.colors.PINK_100,
+                    vertical_alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                )
+            )
+
+        # Show Deck
+        if self.page.route[:6] == "/deck/":
+            deck_name = self.page.route[6:]
+            deck = Deck(self.vocabs[deck_name], self.page_props)
+
+            self.page.views.append(
+                ft.View(
+                    "/deck/{deck_name}",
+                    [
+                        ft.AppBar(title=ft.Text(f"{deck_name}"), center_title=True),
+                        deck,
+                    ],
+                    bgcolor=ft.colors.PINK_100,
+                    #decoration=ft.BoxDecoration(image=ft.DecorationImage(src="/images/HD-wallpaper-abstract-blue-green-lime.jpg",
+                    #                                                     fit=ft.ImageFit.COVER,
+                    #                                                     opacity=1)),
+                    vertical_alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                )
+            )
+
+        self.page.update()
+
+
+    def view_pop(self, view):
+        self.page.views.pop()
+        top_view = self.page.views[-1]
+        self.page.go(top_view.route)
+        
+
+    
+
+
 def main(page: ft.Page):
     page.title = "Satsang Vocabulary App"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
@@ -314,64 +393,21 @@ def main(page: ft.Page):
     all_deck_names = list(vocabs.keys()) 
 
 
-    def route_change(route):
-        print("ROUTE CHANGE", route)
-
-        page.views.clear()
-
-        # Show All Decks
-        page.views.append(
-            ft.View(
-                "/all_decks",
-                [
-                    flashcard_app,
-                ],
-                bgcolor=ft.colors.PINK_100,
-                vertical_alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER
-            )
-        )
-
-        # Show Deck
-        if page.route[:6] == "/deck/":
-            deck_name = page.route[6:]
-            deck = Deck(vocabs[deck_name], page_props)
-
-            page.views.append(
-                ft.View(
-                    "/deck/{deck_name}",
-                    [
-                        deck,
-                    ],
-                    bgcolor=ft.colors.PINK_100,
-                    #decoration=ft.BoxDecoration(image=ft.DecorationImage(src="/images/HD-wallpaper-abstract-blue-green-lime.jpg",
-                    #                                                     fit=ft.ImageFit.COVER,
-                    #                                                     opacity=1)),
-                    vertical_alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                )
-            )
-
-        page.update()
-
-
-    def view_pop(view):
-        page.views.pop()
-        top_view = page.views[-1]
-        page.go(top_view.route)
 
     # create application instance
     page_props = {"width" : page.width,
                   "height" : page.height}
 
     # Objects
-    flashcard_app = FlashCardApp(page, page_props, all_deck_names) # vocab, page_props)
+    #flashcard_app = FlashCardApp(page, page_props, all_deck_names) # vocab, page_props)
     #deck = Deck(vocab, page_props)
 
     # add application's root control to the page
-    page.on_route_change = route_change
-    page.on_view_pop = view_pop
-    page.go("/") # (flashcard_app) # deck)
+    #page.go("/")
+
+    # Orchestrator
+    orchestrator = Orchestrator(page, vocabs)
+    orchestrator.start()
 
 
 ft.app(target=main)
