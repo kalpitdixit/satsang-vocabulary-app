@@ -355,8 +355,17 @@ class Orchestrator:
         self.page.go(route)
 
 
+    def handle_login(self, e):
+        print("handling login")
+        self.page.login(self.provider)
+
+
     def route_change(self, route):
         print("ROUTE CHANGE", route)
+        print(self.page.auth)
+        if self.page.auth is not None:
+            print(self.page.auth.__dict__)
+            print(self.page.auth.user)
 
         self.page.controls.clear()
 
@@ -368,7 +377,7 @@ class Orchestrator:
                     [
                         ft.AppBar(actions=[
                                     ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
-                                                  on_click=self.page.login(self.provider)
+                                                  on_click=self.handle_login,
                                                  )
                                 ]),
                         self.flashcard_app,
