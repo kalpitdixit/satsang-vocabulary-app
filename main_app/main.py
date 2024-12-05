@@ -319,12 +319,16 @@ def main(page: ft.Page):
 
         page.views.clear()
 
+        # Show All Decks
         page.views.append(
             ft.View(
                 "/all_decks",
                 [
                     flashcard_app,
                 ],
+                bgcolor=ft.colors.PINK_100,
+                vertical_alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER
             )
         )
 
@@ -332,14 +336,22 @@ def main(page: ft.Page):
         if page.route[:6] == "/deck/":
             deck_name = page.route[6:]
             deck = Deck(vocabs[deck_name], page_props)
+
             page.views.append(
                 ft.View(
                     "/deck/{deck_name}",
                     [
                         deck,
                     ],
+                    bgcolor=ft.colors.PINK_100,
+                    #decoration=ft.BoxDecoration(image=ft.DecorationImage(src="/images/HD-wallpaper-abstract-blue-green-lime.jpg",
+                    #                                                     fit=ft.ImageFit.COVER,
+                    #                                                     opacity=1)),
+                    vertical_alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 )
             )
+
         page.update()
 
 
@@ -359,7 +371,7 @@ def main(page: ft.Page):
     # add application's root control to the page
     page.on_route_change = route_change
     page.on_view_pop = view_pop
-    page.add(flashcard_app) # deck)
+    page.go("/") # (flashcard_app) # deck)
 
 
 ft.app(target=main)
