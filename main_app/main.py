@@ -365,6 +365,17 @@ class Orchestrator:
         self.page.logout()
         print(self.page.auth)
 
+
+    def get_AppBar(self, route):
+        if route[:6] == "/deck/":
+            deck_name = self.page.route[6:]
+            app_bar = ft.AppBar(
+                        title=ft.Text(f"{deck_name}"),
+                        center_title=True,
+                      )
+        return app_bar
+
+
     def route_change(self, route):
         print("ROUTE CHANGE", route)
         print(self.page.auth)
@@ -419,9 +430,7 @@ class Orchestrator:
                 ft.View(
                     "/deck/{deck_name}",
                     [
-                        ft.AppBar(title=ft.Text(f"{deck_name}"),
-                                  center_title=True,
-                        ),
+                        self.get_AppBar(self.page.route),
                         deck,
                     ],
                     bgcolor=ft.colors.PINK_100,
@@ -483,4 +492,5 @@ def main(page: ft.Page):
     orchestrator.start()
 
 
-ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
+ft.app(target=main)
+#ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
