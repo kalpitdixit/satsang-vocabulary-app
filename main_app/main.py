@@ -329,8 +329,8 @@ class Orchestrator:
             client_id="ioQ4UgajAgoAxz2PahBbeuSrs8zrLEu8",
             client_secret="11M8ZGiC727PS75w8BBBOyKYx96-3UAMOYUqTj0dLnH5N77AYqO9NQOU_lEQVknV",
             domain="dev-50q3lvc10l4nm2s1.us.auth0.com",
-            redirect_url="http://localhost:8550/api/oauth/redirect"
-            #redirect_url="http://localhost:8550/oauth_callback",
+            #redirect_url="http://localhost:8550/api/oauth/redirect"
+            redirect_url="http://localhost:8550/oauth_callback",
         )
         self.page.on_login = self.on_login
 

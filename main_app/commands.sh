@@ -8,6 +8,7 @@ mv build ../../b
 # commit branch main
 ga -u
 gc -m "updates"
+git push
 
 # checkout branch gh-pages-3
 git checkout gh-pages-3
