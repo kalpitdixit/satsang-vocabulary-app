@@ -360,6 +360,11 @@ class Orchestrator:
         self.page.login(self.provider)
 
 
+    def handle_logout(self, e):
+        print("handling login")
+        self.page.logout()
+        print(self.page.auth)
+
     def route_change(self, route):
         print("ROUTE CHANGE", route)
         print(self.page.auth)
@@ -393,11 +398,30 @@ class Orchestrator:
             deck_name = self.page.route[6:]
             deck = Deck(self.vocabs[deck_name], self.page_props)
 
+            """
+              actions=[
+                    ft.PopupMenuButton(
+                        items=[
+                            ft.PopupMenuItem(
+                                content=ft.Row(
+                                    controls=[
+                                        ft.Icon(ft.icons.LOGOUT_ROUNDED),
+                                        ft.Text("Logout")
+                                    ]
+                                ),
+                                on_click=self.handle_logout
+                            )
+                        ]
+                    )
+                ]
+            """
             self.page.views.append(
                 ft.View(
                     "/deck/{deck_name}",
                     [
-                        ft.AppBar(title=ft.Text(f"{deck_name}"), center_title=True),
+                        ft.AppBar(title=ft.Text(f"{deck_name}"),
+                                  center_title=True,
+                        ),
                         deck,
                     ],
                     bgcolor=ft.colors.PINK_100,
