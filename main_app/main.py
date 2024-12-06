@@ -366,12 +366,35 @@ class Orchestrator:
         print(self.page.auth)
 
 
+    def get_user_logo(self):
+        if self.page.auth is not None:
+            logo = self.page.auth.user["nickname"][:2]
+            logo = ft.Container(
+                    content=ft.Text(logo,
+                                    color=ft.colors.WHITE,
+                                    weight=ft.FontWeight.BOLD,
+                                    size=FONT_SIZE_3),
+                    #padding=10,
+                    #alignment=ft.alignment.center,
+                    bgcolor=ft.colors.BLUE_900,
+                    #width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    #height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
+                    border_radius=20,
+                   )
+        return logo            
+
+
     def get_AppBar(self, route):
         if route[:6] == "/deck/":
             deck_name = self.page.route[6:]
+            if self.page.auth is not None: # if logged in
+                actions = [self.get_user_logo()]
+            else:
+                actions = []
             app_bar = ft.AppBar(
                         title=ft.Text(f"{deck_name}"),
                         center_title=True,
+                        actions=actions
                       )
         return app_bar
 
@@ -391,11 +414,11 @@ class Orchestrator:
                 ft.View(
                     "/all_decks",
                     [
-                        ft.AppBar(actions=[
-                                    ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
-                                                  on_click=self.handle_login,
-                                                 )
-                                ]),
+                        #ft.AppBar(actions=[
+                        #            ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
+                        #                          on_click=self.handle_login,
+                        #                         )
+                        #        ]),
                         self.flashcard_app,
                     ],
                     bgcolor=ft.colors.PINK_100,
