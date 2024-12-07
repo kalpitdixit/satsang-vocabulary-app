@@ -475,5 +475,5 @@ def main(page: ft.Page):
     orchestrator.start()
 
 
-ft.app(target=main)
-#ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
+#ft.app(target=main)
+ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
