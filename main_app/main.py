@@ -14,6 +14,9 @@ TEXT_BOX_HEIGHT_PERCENTAGE_3 = 10
 BUTTON_HEIGHT_PERCENTAGE = 5
 PROGRESS_BAR_HEIGHT_PERCENTAGE = 3
 
+PROGRESS_RING_HEIGHT_PERCENTAGE = 3
+PROGRESS_RING_WIDTH_PERCENTAGE = 3
+
 VERTICAL_LINE_WIDTH_PERCENTAGE = 1
 
 FONT_SIZE_1 = 25
@@ -401,7 +404,8 @@ class Deck(ft.Column):
         def progress_ring_factory(k):
             return ft.ProgressRing(
                     value=len(self.spaced_reps[k]) / self.num_words,
-                    #width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
                     #bar_height=self.page_props["height"] * PROGRESS_BAR_HEIGHT_PERCENTAGE / 100, # "50vh",
                     bgcolor=ft.colors.GREY_100,
                     #color=color
