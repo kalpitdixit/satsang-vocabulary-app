@@ -686,10 +686,13 @@ def main(page: ft.Page):
     page.update()
 
     # All Decks
+    """
     decks = OrderedDict()
     for fname in sorted(list(glob.glob(f"decks/*txt"))):
         decks[os.path.basename(fname).strip(".txt")] = read_deck_txt(fname)
     print(decks)
+    """
+    decks = OrderedDict([('Deck 1 - 15 Nov 2024', {'\ufeffરત્નત્રય': ('ratnatray', 'Samyak Darshan (Faith)\nSamyak Gnaan (Knowledge)\nSamyak Charitra (Conduct)'), 'નય': ('nay', 'Point of View'), 'કૃત્રિમ': ('Krutrim', 'Artificial'), 'નિર્મલ, સમલ': ('Nirmal, Samal', 'without-impurities, with-impurities'), 'પ્રેરક, પ્રેરણા, પ્રેરિત': ('prerak, prerna, prerit', 'inspirer, inspiration, inspired'), 'પ્રીતિ and પ્રતીતિ': ('priti and pratiti', 'love and conviction'), 'પૂર્ણ and પરિપૂર્ણ': ('purna and pari-purna', 'full / complete and so full / complete that nothing more can be added'), 'અવ્યાબાધ': ('avyabadha', 'unobstructed'), 'તીર્થપતિ': ('Tirthpati', 'creator of Tirth - Tirthankar'), 'ત્રિકાળ': ('trikaal', 'past, present and future'), 'આપ and પર': ('aap and par', 'me and others')}), ('Deck 2 - 7 Dec 2024', {'\ufeffવિસ્તાર': ('vistara', 'area, expanse, elaborate'), 'માહિતી': ('mahiti', 'information'), 'ભેદ': ('bhed', 'differences, categories'), 'પ્રમાણ': ('pramaan', 'proof'), 'ઉપમા': ('upama', 'simile, comparison'), 'મત': ('mat', 'opinion'), 'લઘુ and ગુરુ': ('Laghu and Guru', 'light and heavy\nsmall and big'), 'અચલ': ('achal', 'immovable'), 'મલિનતા': ('malinta', 'impurity, dirtiness, filthiness'), 'ચંચળતા': ('chanchalta', 'restlessness'), 'યોગ and જોગ': ('yog and jog', 'association and utilizing the association')})])
    
     all_deck_names = list(decks.keys()) 
 
