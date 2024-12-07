@@ -16,7 +16,7 @@ PROGRESS_BAR_HEIGHT_PERCENTAGE = 3
 
 VERTICAL_LINE_WIDTH_PERCENTAGE = 1
 
-FONT_SIZE_1 = 30
+FONT_SIZE_1 = 25
 FONT_SIZE_2 = 20
 FONT_SIZE_3 = 15
 
@@ -204,7 +204,6 @@ class Deck(ft.Column):
         self.page.views[-1].bgcolor = "#edc343"  
         self.page.update()
 
-        print(self.page.fonts)
         self.controls = [
                 ft.Container(
                     content=ft.Row(
@@ -218,8 +217,23 @@ class Deck(ft.Column):
                         ),
                         ft.Column(
                             [
-                                ft.Text(self.curr_word, font_family="Playfair Display", size=FONT_SIZE_1),
-                                ft.Text(self.vocab[self.curr_word][0], font_family="Playfair Display", size=FONT_SIZE_1)
+                                ft.Container(
+                                    content=ft.Text(
+                                        self.curr_chosen_category,
+                                        size=FONT_SIZE_3,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.colors.BLACK,
+                                    ),
+                                    bgcolor="#fce5b2", # ft.colors.WHITE,
+                                    padding=ft.padding.symmetric(horizontal=10, vertical=8),
+                                    border_radius=20,
+                                ),
+                                ft.Text(self.curr_word,
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_1),
+                                ft.Text(self.vocab[self.curr_word][0],
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_1)
                             ]
                         )
                     ]),
@@ -269,9 +283,23 @@ class Deck(ft.Column):
                         ),
                         ft.Column(
                             [
-                                ft.Text(self.curr_word, size=FONT_SIZE_2),
-                                ft.Text(self.vocab[self.curr_word][0], size=FONT_SIZE_2),
-                                ft.Text(self.vocab[self.curr_word][1], size=FONT_SIZE_2),
+                                ft.Container(
+                                    content=ft.Text(
+                                        self.curr_chosen_category,
+                                        size=FONT_SIZE_3,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.colors.BLACK,
+                                    ),
+                                    bgcolor="#fce5b2", # ft.colors.WHITE,
+                                    padding=ft.padding.symmetric(horizontal=10, vertical=8),
+                                    border_radius=20,
+                                ),
+                                ft.Text(self.curr_word,
+                                        size=FONT_SIZE_2),
+                                ft.Text(self.vocab[self.curr_word][0],
+                                        size=FONT_SIZE_2),
+                                ft.Text(self.vocab[self.curr_word][1],
+                                        size=FONT_SIZE_2),
                             ]
                         )
                     ]),
@@ -490,14 +518,14 @@ def main(page: ft.Page):
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.update()
 
-    page.fonts = {"Playfair Display" : "https://fonts.google.com/specimen/Playfair+Display"}
+    page.fonts = {"Playfair Display Extra Bold" : "fonts/PlayfairDisplay-ExtraBold.ttf"}
 
     # All Decks
     vocabs = OrderedDict([
                 ("Beejam Kram I", {"રત્નત્રય" : ("ratnatray", "Samyak Darshan (Faith), Samyak Gnaan (Knowledge), Samyak Charitra (Conduct)"),
                                    "નય" : ("nay", "point of view, dimension"),
-                                   "ક્રુત્રિમ ": ("Krutrim", "Artificial"),
-                                   "નિર્મલ સમલ" : ("Nirmal, Samal", "without-impurities, with-impurities")}),
+                                   "ક્રુત્રિમ ": ("krutrim", "Artificial"),
+                                   "નિર્મલ સમલ" : ("nirmal, samal", "without-impurities, with-impurities")}),
                 ("Beejam Kram II", {"lorem" : ("ipsum", "dolor sit amet")})
              ])
 
@@ -522,6 +550,6 @@ def main(page: ft.Page):
     orchestrator.start()
 
 
-ft.app(target=main)
-#ft.app(target=main, assets_dir="assets")
+#ft.app(target=main)
+ft.app(target=main, assets_dir="assets")
 #ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
