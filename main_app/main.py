@@ -14,6 +14,8 @@ TEXT_BOX_HEIGHT_PERCENTAGE_3 = 10
 BUTTON_HEIGHT_PERCENTAGE = 5
 PROGRESS_BAR_HEIGHT_PERCENTAGE = 3
 
+VERTICAL_LINE_WIDTH_PERCENTAGE = 1
+
 FONT_SIZE_1 = 30
 FONT_SIZE_2 = 20
 FONT_SIZE_3 = 15
@@ -153,9 +155,10 @@ class FlashCardApp(ft.Column):
 
 
 class Deck(ft.Column):
-    def __init__(self, vocab, page_props):
+    def __init__(self, vocab, page, page_props):
         super().__init__()
         self.vocab = vocab
+        self.page = page
         self.page_props = page_props
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
@@ -197,13 +200,32 @@ class Deck(ft.Column):
     def show_next_word(self, e):
         self.choose_next_word()
         self.curr_word = self.curr_spaced_rep_obj.word
+                  
+        self.page.views[-1].bgcolor = "#edc343"  
+        self.page.update()
 
+        print(self.page.fonts)
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word, size=FONT_SIZE_1),
+                    content=ft.Row(
+                        [
+                        # Vertical bar
+                        ft.Container(
+                            width=self.page_props["width"] * VERTICAL_LINE_WIDTH_PERCENTAGE / 100, # "50vw",
+                            height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
+                            bgcolor=ft.colors.BLACK,
+                            margin=ft.margin.only(right=20)
+                        ),
+                        ft.Column(
+                            [
+                                ft.Text(self.curr_word, font_family="Playfair Display", size=FONT_SIZE_1),
+                                ft.Text(self.vocab[self.curr_word][0], font_family="Playfair Display", size=FONT_SIZE_1)
+                            ]
+                        )
+                    ]),
                     padding=10,
                     alignment=ft.alignment.center,
-                    bgcolor=ft.colors.AMBER_200,
+                    bgcolor=ft.colors.TRANSPARENT, # AMBER_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
@@ -213,10 +235,10 @@ class Deck(ft.Column):
                     "Click to see meaning",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.colors.GREY_100,
+                    bgcolor=ft.colors.TRANSPARENT, # GREY_100,
                     icon="arrow_right_alt_rounded",
-                    icon_color="grey500",
-                    color=ft.colors.GREY_500,
+                    icon_color="black", # "grey500",
+                    color=ft.colors.BLACK, # GREY_500,
                     on_click=self.show_meaning
                 ),
         ]
@@ -230,12 +252,32 @@ class Deck(ft.Column):
 
 
     def show_meaning(self, e):
+
+        self.page.views[-1].bgcolor = "#a3e1c2"
+        self.page.update()
+
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word + "\n\n" + self.vocab[self.curr_word], size=FONT_SIZE_2),
+                    content=ft.Row(
+                    [
+                        # Vertical bar
+                        ft.Container(
+                            width=self.page_props["width"] * VERTICAL_LINE_WIDTH_PERCENTAGE / 100, # "50vw",
+                            height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
+                            bgcolor=ft.colors.BLACK,
+                            margin=ft.margin.only(right=20)
+                        ),
+                        ft.Column(
+                            [
+                                ft.Text(self.curr_word, size=FONT_SIZE_2),
+                                ft.Text(self.vocab[self.curr_word][0], size=FONT_SIZE_2),
+                                ft.Text(self.vocab[self.curr_word][1], size=FONT_SIZE_2),
+                            ]
+                        )
+                    ]),
                     padding=10,
                     alignment=ft.alignment.center,
-                    bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
+                    bgcolor=ft.colors.TRANSPARENT, # LIGHT_BLUE_ACCENT_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
@@ -245,20 +287,20 @@ class Deck(ft.Column):
                     "I knew this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.colors.GREEN_100,
+                    bgcolor="#6dcc93", # ft.colors.GREEN_100,
                     icon="check_rounded",
-                    icon_color="green500",
-                    color=ft.colors.GREEN_500,
+                    icon_color="green900",
+                    color=ft.colors.GREEN_900,
                     on_click=lambda e: self.update_spaced_repetition(e, True)
                 ),
                 ft.ElevatedButton(
                     "I didn't know this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.colors.RED_100,
+                    bgcolor="#d88073", # ft.colors.RED_100,
                     icon="cancel_rounded",
-                    icon_color="red500",
-                    color=ft.colors.RED_500,
+                    icon_color="red900",
+                    color=ft.colors.RED_900,
                     on_click=lambda e: self.update_spaced_repetition(e, False)
                 ),
         ]
@@ -355,6 +397,7 @@ class Orchestrator:
 
     def get_AppBar(self, route):
         # Actions
+        """
         if self.page.auth is None:
             actions = [ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
                                      on_click=self.handle_login),
@@ -363,6 +406,8 @@ class Orchestrator:
             actions = [ft.IconButton(ft.icons.WB_SUNNY_ROUNDED,
                                      on_click=self.handle_login),
                       ]
+        """
+        actions = []
 
         # AppBar
         if route=="/":
@@ -400,7 +445,7 @@ class Orchestrator:
                         self.get_AppBar(self.page.route),
                         self.flashcard_app,
                     ],
-                    bgcolor=ft.colors.PINK_100,
+                    bgcolor="#f3c017",
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 )
@@ -409,7 +454,7 @@ class Orchestrator:
         # Show Deck
         if self.page.route[:6] == "/deck/":
             deck_name = self.page.route[6:]
-            deck = Deck(self.vocabs[deck_name], self.page_props)
+            deck = Deck(self.vocabs[deck_name], self.page, self.page_props)
 
             self.page.views.append(
                 ft.View(
@@ -418,7 +463,7 @@ class Orchestrator:
                         self.get_AppBar(self.page.route),
                         deck,
                     ],
-                    bgcolor=ft.colors.PINK_100,
+                    bgcolor="#edc343",
                     #decoration=ft.BoxDecoration(image=ft.DecorationImage(src="/images/HD-wallpaper-abstract-blue-green-lime.jpg",
                     #                                                     fit=ft.ImageFit.COVER,
                     #                                                     opacity=1)),
@@ -445,6 +490,8 @@ def main(page: ft.Page):
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.update()
 
+    page.fonts = {"Playfair Display" : "https://fonts.google.com/specimen/Playfair+Display"}
+
     # All Decks
     vocabs = OrderedDict([
                 ("Beejam Kram I", {"રત્નત્રય" : ("ratnatray", "Samyak Darshan (Faith), Samyak Gnaan (Knowledge), Samyak Charitra (Conduct)"),
@@ -454,8 +501,8 @@ def main(page: ft.Page):
                 ("Beejam Kram II", {"lorem" : ("ipsum", "dolor sit amet")})
              ])
 
-    for k,v in vocabs.items():
-        vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
+    #for k,v in vocabs.items():
+    #   vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
 
     all_deck_names = list(vocabs.keys()) 
 
@@ -476,4 +523,5 @@ def main(page: ft.Page):
 
 
 ft.app(target=main)
+#ft.app(target=main, assets_dir="assets")
 #ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
