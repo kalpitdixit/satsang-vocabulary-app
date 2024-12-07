@@ -319,13 +319,12 @@ class Orchestrator:
 
         self.page.on_route_change = self.route_change
         self.page.on_view_pop = self.view_pop
-        #self.page.font_family = "RobotoSlab"
+        self.page.font_family = "RobotoSlab"
 
         self.page_props = {"width" : page.width,
                            "height" : page.height}
    
         # OAuth
-        """
         self.provider = Auth0OAuthProvider(
             client_id="ioQ4UgajAgoAxz2PahBbeuSrs8zrLEu8",
             client_secret="11M8ZGiC727PS75w8BBBOyKYx96-3UAMOYUqTj0dLnH5N77AYqO9NQOU_lEQVknV",
@@ -333,7 +332,6 @@ class Orchestrator:
             #redirect_url="http://localhost:8550/api/oauth/redirect"
             redirect_url="http://localhost:8550/oauth_callback",
         )
-        """
         self.page.on_login = self.on_login
 
 
@@ -344,7 +342,7 @@ class Orchestrator:
 
 
     def start(self):
-        self.page.go("/") # goes to route_chage(...)
+        self.page.go("/all_decks") # goes to route_chage(...)
 
 
     def on_login(self, e):
@@ -362,45 +360,6 @@ class Orchestrator:
         self.page.login(self.provider)
 
 
-    def handle_logout(self, e):
-        print("handling login")
-        self.page.logout()
-        print(self.page.auth)
-
-
-    def get_user_logo(self):
-        if self.page.auth is not None:
-            logo = self.page.auth.user["nickname"][:2]
-            logo = ft.Container(
-                    content=ft.Text(logo,
-                                    color=ft.colors.WHITE,
-                                    weight=ft.FontWeight.BOLD,
-                                    size=FONT_SIZE_3),
-                    #padding=10,
-                    #alignment=ft.alignment.center,
-                    bgcolor=ft.colors.BLUE_900,
-                    #width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    #height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
-                    border_radius=20,
-                   )
-        return logo            
-
-
-    def get_AppBar(self, route):
-        if route[:6] == "/deck/":
-            deck_name = self.page.route[6:]
-            if self.page.auth is not None: # if logged in
-                actions = [self.get_user_logo()]
-            else:
-                actions = []
-            app_bar = ft.AppBar(
-                        title=ft.Text(f"{deck_name}"),
-                        center_title=True,
-                        actions=actions
-                      )
-        return app_bar
-
-
     def route_change(self, route):
         print("ROUTE CHANGE", route)
         print(self.page.auth)
@@ -411,16 +370,16 @@ class Orchestrator:
         self.page.controls.clear()
 
         # Show All Decks
-        if self.page.route=="/":
+        if self.page.route=="/all_decks":
             self.page.views.append(
                 ft.View(
                     "/all_decks",
                     [
-                        #ft.AppBar(actions=[
-                        #            ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
-                        #                          on_click=self.handle_login,
-                        #                         )
-                        #        ]),
+                        ft.AppBar(actions=[
+                                    ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
+                                                  on_click=self.handle_login,
+                                                 )
+                                ]),
                         self.flashcard_app,
                     ],
                     bgcolor=ft.colors.PINK_100,
@@ -434,28 +393,11 @@ class Orchestrator:
             deck_name = self.page.route[6:]
             deck = Deck(self.vocabs[deck_name], self.page_props)
 
-            """
-              actions=[
-                    ft.PopupMenuButton(
-                        items=[
-                            ft.PopupMenuItem(
-                                content=ft.Row(
-                                    controls=[
-                                        ft.Icon(ft.icons.LOGOUT_ROUNDED),
-                                        ft.Text("Logout")
-                                    ]
-                                ),
-                                on_click=self.handle_logout
-                            )
-                        ]
-                    )
-                ]
-            """
             self.page.views.append(
                 ft.View(
                     "/deck/{deck_name}",
                     [
-                        self.get_AppBar(self.page.route),
+                        ft.AppBar(title=ft.Text(f"{deck_name}"), center_title=True),
                         deck,
                     ],
                     bgcolor=ft.colors.PINK_100,
@@ -497,25 +439,9 @@ def main(page: ft.Page):
     for k,v in vocabs.items():
         vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
 
-    all_deck_names = list(vocabs.keys()) 
-
-
-
-    # create application instance
-    page_props = {"width" : page.width,
-                  "height" : page.height}
-
-    # Objects
-    #flashcard_app = FlashCardApp(page, page_props, all_deck_names) # vocab, page_props)
-    #deck = Deck(vocab, page_props)
-
-    # add application's root control to the page
-    #page.go("/")
-
     # Orchestrator
     orchestrator = Orchestrator(page, vocabs)
     orchestrator.start()
 
 
-ft.app(target=main)
-#ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
+ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
