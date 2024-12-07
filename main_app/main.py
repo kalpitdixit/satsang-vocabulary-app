@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 
 TEXT_BOX_WIDTH_PERCENTAGE = 75
-TEXT_BOX_HEIGHT_PERCENTAGE_1 = 40
+TEXT_BOX_HEIGHT_PERCENTAGE_1 = 30
 TEXT_BOX_HEIGHT_PERCENTAGE_2 = 20
 TEXT_BOX_HEIGHT_PERCENTAGE_3 = 10
 
@@ -245,14 +245,19 @@ class Deck(ft.Column):
                     border_radius=10,
                     ink=True,
                 ),
-                ft.ElevatedButton(
-                    "Click to see meaning",
+                ft.OutlinedButton(
+                    "Flip to see meaning",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.colors.TRANSPARENT, # GREY_100,
                     icon="arrow_right_alt_rounded",
                     icon_color="black", # "grey500",
-                    color=ft.colors.BLACK, # GREY_500,
+                    style=ft.ButtonStyle(
+                            color=ft.colors.BLACK,
+                            side=ft.BorderSide(
+                                color=ft.colors.BLACK,
+                                width=1,
+                                )
+                            ), # GREY_500,
                     on_click=self.show_meaning
                 ),
         ]
@@ -290,15 +295,15 @@ class Deck(ft.Column):
                                         weight=ft.FontWeight.BOLD,
                                         color=ft.colors.BLACK,
                                     ),
-                                    bgcolor="#fce5b2", # ft.colors.WHITE,
+                                    bgcolor="#d3f8e6", # "#fce5b2", # ft.colors.WHITE,
                                     padding=ft.padding.symmetric(horizontal=10, vertical=8),
                                     border_radius=20,
                                 ),
                                 ft.Text(self.curr_word,
+                                        font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_2),
                                 ft.Text(self.vocab[self.curr_word][0],
-                                        size=FONT_SIZE_2),
-                                ft.Text(self.vocab[self.curr_word][1],
+                                        font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_2),
                             ]
                         )
@@ -311,33 +316,68 @@ class Deck(ft.Column):
                     border_radius=10,
                     ink=True,
                 ),
-                ft.ElevatedButton(
+                ft.Container(
+                        content=ft.Text(self.vocab[self.curr_word][1],
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_2),
+                    padding=10,
+                    alignment=ft.alignment.center,
+                    bgcolor=ft.colors.TRANSPARENT, # LIGHT_BLUE_ACCENT_200,
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_2 / 100, # "50vh",
+                    border_radius=10,
+                    ink=True,
+                ),
+                ft.OutlinedButton(
                     "I knew this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor="#6dcc93", # ft.colors.GREEN_100,
                     icon="check_rounded",
                     icon_color="green900",
-                    color=ft.colors.GREEN_900,
+                    style=ft.ButtonStyle(
+                            color=ft.colors.GREEN_900,
+                            side=ft.BorderSide(
+                                color=ft.colors.BLACK,
+                                width=1,
+                                )
+                            ),
                     on_click=lambda e: self.update_spaced_repetition(e, True)
                 ),
-                ft.ElevatedButton(
+                ft.OutlinedButton(
                     "I didn't know this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor="#d88073", # ft.colors.RED_100,
                     icon="cancel_rounded",
                     icon_color="red900",
-                    color=ft.colors.RED_900,
+                    style=ft.ButtonStyle(
+                            color=ft.colors.RED_900,
+                            side=ft.BorderSide(
+                                color=ft.colors.BLACK,
+                                width=1,
+                                )
+                            ),
                     on_click=lambda e: self.update_spaced_repetition(e, False)
                 ),
         ]
+        """
+        ft.ElevatedButton(
+            "I didn't know this word",
+            width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+            height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
+            bgcolor="#d88073", # ft.colors.RED_100,
+            icon="cancel_rounded",
+            icon_color="red900",
+            color=ft.colors.RED_900,
+            on_click=lambda e: self.update_spaced_repetition(e, False)
+        ),
+        """
 
         self.controls.extend(self.get_progress_bars())
         self.update()
 
 
     def get_progress_bars(self):
+        """
         def progress_bar_factory(text, k, color):
             return [
                 ft.Text(f"You {text} {len(self.spaced_reps[k])} out of {self.num_words} words"),
@@ -354,6 +394,55 @@ class Deck(ft.Column):
                              ("are reviewing", "Reviewing", ft.colors.AMBER_500),
                              ("are learning", "Learning", ft.colors.RED_500)]:
             progress_bars.extend(progress_bar_factory(text, k, color))
+        """
+        
+
+        
+        def progress_ring_factory(k):
+            return ft.ProgressRing(
+                    value=len(self.spaced_reps[k]) / self.num_words,
+                    #width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    #bar_height=self.page_props["height"] * PROGRESS_BAR_HEIGHT_PERCENTAGE / 100, # "50vh",
+                    bgcolor=ft.colors.GREY_100,
+                    #color=color
+                )
+        
+        progress_bars = [ft.Container(
+                            ft.Column([
+                                ft.Row([
+                                    ft.Stack(
+                                        controls=[
+                                            progress_ring_factory("Mastered"),
+                                            ft.Container(
+                                                content=ft.Text(
+                                                    len(self.spaced_reps["Mastered"]),
+                                                    size=FONT_SIZE_3,
+                                                    weight=ft.FontWeight.BOLD,
+                                                ),
+                                                alignment=ft.alignment.center
+                                            )
+                                        ]
+                                    ),
+                                    progress_ring_factory("Reviewing"),
+                                    progress_ring_factory("Learning"),
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_EVENLY
+                                ),
+                                ft.Row([
+                                    ft.Text("Mastered",
+                                            weight=ft.FontWeight.BOLD),
+                                    ft.Text("Reviewing",
+                                            weight=ft.FontWeight.BOLD),
+                                    ft.Text("Learning",
+                                            weight=ft.FontWeight.BOLD),
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_EVENLY
+                                ),
+                            ]),
+                            width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100,
+                            ) 
+                        ]
+
         return progress_bars
 
 
@@ -516,9 +605,13 @@ def main(page: ft.Page):
     page.title = "Satsang Vocabulary App"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.update()
 
-    page.fonts = {"Playfair Display Extra Bold" : "fonts/PlayfairDisplay-ExtraBold.ttf"}
+    page.fonts = {"Roboto Condensed" : "RobotoCondensed-Regular.ttf",
+                  "Playfair Display Extra Bold" : "fonts/PlayfairDisplay-ExtraBold.ttf"}
+
+    page.theme = ft.Theme(font_family="Roboto Condensed")
+
+    page.update()
 
     # All Decks
     vocabs = OrderedDict([
