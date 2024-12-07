@@ -1,8 +1,10 @@
+import os
 import flet as ft
 #from flet.auth.providers import Auth0OAuthProvider
 #from flet.auth.providers import GitHubOAuthProvider
 
 import random
+import glob
 from collections import OrderedDict
 
 
@@ -158,12 +160,12 @@ class FlashCardApp(ft.Column):
 
 
 class Deck(ft.Column):
-    def __init__(self, vocab, page, page_props):
+    def __init__(self, deck, page, page_props):
         super().__init__()
-        self.vocab = vocab
+        self.deck = deck
         self.page = page
         self.page_props = page_props
-        self.words = list(vocab.keys())
+        self.words = list(deck.keys())
         self.num_words = len(self.words)
 
         self.curr_ind = -1
@@ -235,7 +237,7 @@ class Deck(ft.Column):
                                 ft.Text(self.curr_word,
                                         font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_1),
-                                ft.Text(self.vocab[self.curr_word][0],
+                                ft.Text(self.deck[self.curr_word][0],
                                         font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_1)
                             ]
@@ -307,7 +309,7 @@ class Deck(ft.Column):
                                 ft.Text(self.curr_word,
                                         font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_2),
-                                ft.Text(self.vocab[self.curr_word][0],
+                                ft.Text(self.deck[self.curr_word][0],
                                         font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_2),
                             ]
@@ -322,8 +324,8 @@ class Deck(ft.Column):
                     ink=True,
                 ),
                 ft.Container(
-                        content=ft.Text(self.vocab[self.curr_word][1],
-                                        font_family="Playfair Display Extra Bold",
+                        content=ft.Text(self.deck[self.curr_word][1],
+                                        color=ft.colors.BLACK,
                                         size=FONT_SIZE_2),
                     padding=10,
                     alignment=ft.alignment.center,
@@ -438,22 +440,26 @@ class Deck(ft.Column):
                                     progress_ring_factory("Mastered"),
                                     ft.Text("Mastered",
                                             weight=ft.FontWeight.BOLD),
-                                    ]),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER),
                                 ft.Column([
                                     progress_ring_factory("Reviewing"),
                                     ft.Text("Reviewing",
                                             weight=ft.FontWeight.BOLD),
-                                    ]),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER),
                                 ft.Column([
                                     progress_ring_factory("Learning"),
                                     ft.Text("Learning",
                                             weight=ft.FontWeight.BOLD),
-                                    ]),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER),
                                 ft.Column([
                                     progress_ring_factory("Unseen"),
                                     ft.Text("Unseen",
                                             weight=ft.FontWeight.BOLD),
-                                    ]),
+                                    ],
+                                    alignment=ft.MainAxisAlignment.CENTER),
                                 ],
                                 alignment=ft.MainAxisAlignment.SPACE_EVENLY
                                 ),
@@ -479,11 +485,11 @@ class Deck(ft.Column):
 
 
 class Orchestrator:
-    def __init__(self, page, vocabs):
+    def __init__(self, page, decks):
         self.page = page
-        self.vocabs = vocabs
+        self.decks = decks
 
-        self.all_deck_names = list(self.vocabs.keys())
+        self.all_deck_names = list(self.decks.keys())
 
         self.page.on_route_change = self.route_change
         self.page.on_view_pop = self.view_pop
@@ -590,7 +596,7 @@ class Orchestrator:
         # Show Deck
         if self.page.route[:6] == "/deck/":
             deck_name = self.page.route[6:]
-            deck = Deck(self.vocabs[deck_name], self.page, self.page_props)
+            deck = Deck(self.decks[deck_name], self.page, self.page_props)
 
             self.page.views.append(
                 ft.View(
@@ -618,7 +624,53 @@ class Orchestrator:
         self.page.go(top_view.route)
         
 
-    
+def read_deck_csv(fname):
+    with open(fname, "r", encoding="utf-8") as f:
+        headers = f.readline().strip()
+        #headers = headers.encode("ascii", "ignore").decode("ascii")
+        headers = headers.split(",")
+
+        deck = {}
+        for line in f:
+            line = line.strip()
+            line = [x.strip() for x in line.split(",")]
+            gujarati_word = line[0]
+            english_word = line[1]
+            meaning = line[2]
+            
+            deck[gujarati_word] = (english_word, meaning)
+    return deck
+
+
+def read_deck_txt(fname):
+    deck = {}
+
+    guj_word = None
+    eng_word = None
+    meaning = []
+
+    with open(fname, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line=="":
+                meaning = "\n".join(meaning)
+                assert None not in [guj_word, eng_word]
+                assert meaning!=""
+
+                deck[guj_word] = (eng_word, meaning)
+                guj_word = None
+                eng_word = None
+                meaning = []
+            else:
+                if guj_word is None:
+                    guj_word = line
+                elif eng_word is None:
+                    eng_word = line
+                else:
+                    meaning.append(line)
+        if meaning!=[]:
+            deck[guj_word] = (eng_word, meaning)
+    return deck
 
 
 def main(page: ft.Page):
@@ -634,32 +686,26 @@ def main(page: ft.Page):
     page.update()
 
     # All Decks
-    vocabs = OrderedDict([
-                ("Beejam Kram I", {"રત્નત્રય" : ("ratnatray", "Samyak Darshan (Faith), Samyak Gnaan (Knowledge), Samyak Charitra (Conduct)"),
-                                   "નય" : ("nay", "point of view, dimension"),
-                                   "ક્રુત્રિમ ": ("krutrim", "Artificial"),
-                                   "નિર્મલ સમલ" : ("nirmal, samal", "without-impurities, with-impurities")}),
-                ("Beejam Kram II", {"lorem" : ("ipsum", "dolor sit amet")})
-             ])
-
-    #for k,v in vocabs.items():
-    #   vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
-
-    all_deck_names = list(vocabs.keys()) 
+    decks = OrderedDict()
+    for fname in sorted(list(glob.glob(f"assets/decks/*txt"))):
+        decks[os.path.basename(fname).strip(".txt")] = read_deck_txt(fname)
+    print(decks)
+   
+    all_deck_names = list(decks.keys()) 
 
     # create application instance
     page_props = {"width" : page.width,
                   "height" : page.height}
 
     # Objects
-    #flashcard_app = FlashCardApp(page, page_props, all_deck_names) # vocab, page_props)
-    #deck = Deck(vocab, page_props)
+    #flashcard_app = FlashCardApp(page, page_props, all_deck_names) # deck, page_props)
+    #deck = Deck(deck, page_props)
 
     # add application's root control to the page
     #page.go("/")
 
     # Orchestrator
-    orchestrator = Orchestrator(page, vocabs)
+    orchestrator = Orchestrator(page, decks)
     orchestrator.start()
 
 
