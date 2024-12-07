@@ -130,13 +130,15 @@ class FlashCardApp(ft.Column):
                     spacing=0,
                 )         
 
-        self.controls = [
+        self.controls = []
+        """
                 ft.Text("Satsang Vocabulary Decks",
                         size=FONT_SIZE_1,
                         weight=ft.FontWeight.BOLD,
                         color=ft.Colors.BLACK,
                         text_align=ft.TextAlign.CENTER)
         ]
+        """
 
         # Add Decks
         for title in self.all_deck_names:
@@ -364,12 +366,20 @@ class Orchestrator:
 
         # AppBar
         if route=="/":
-            return ft.AppBar(title=ft.Text("All Decks"),
+            return ft.AppBar(title=ft.Text("Satsang Vocabulary Decks",
+                                           size=FONT_SIZE_1,
+                                           weight=ft.FontWeight.BOLD,
+                                           color=ft.Colors.BLACK,
+                                           text_align=ft.TextAlign.CENTER),
                              center_title=True,
                              actions=actions)
         elif self.page.route[:6] == "/deck/":
             deck_name = self.page.route[6:]
-            return ft.AppBar(title=ft.Text(f"{deck_name}"),
+            return ft.AppBar(title=ft.Text(f"{deck_name}",
+                                           size=FONT_SIZE_1,
+                                           weight=ft.FontWeight.BOLD,
+                                           color=ft.Colors.BLACK,
+                                           text_align=ft.TextAlign.CENTER),
                              center_title=True,
                              actions=actions)
         else:
@@ -465,5 +475,5 @@ def main(page: ft.Page):
     orchestrator.start()
 
 
-#ft.app(target=main)
-ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
+ft.app(target=main)
+#ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
