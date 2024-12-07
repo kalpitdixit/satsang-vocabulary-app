@@ -107,9 +107,9 @@ class FlashCardApp(ft.Column):
                             content=ft.Text(title,
                                             size=FONT_SIZE_2,
                                             weight=ft.FontWeight.BOLD,
-                                            color=ft.Colors.GREY_700),
+                                            color=ft.colors.GREY_700),
                             alignment=ft.alignment.center,
-                            bgcolor=ft.Colors.GREY_100,
+                            bgcolor=ft.colors.GREY_100,
                             width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                             height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_2 / 100, # "50vh",
                             border_radius=0
@@ -118,9 +118,9 @@ class FlashCardApp(ft.Column):
                             content=ft.Text("Practice this deck ⟶",
                                             size=FONT_SIZE_3,
                                             weight=ft.FontWeight.BOLD,
-                                            color=ft.Colors.GREY_500),
+                                            color=ft.colors.GREY_500),
                             alignment=ft.alignment.center,
-                            bgcolor=ft.Colors.GREY_300,
+                            bgcolor=ft.colors.GREY_300,
                             width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                             height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_3 / 100, # "50vh",
                             border_radius=0,
@@ -135,7 +135,7 @@ class FlashCardApp(ft.Column):
                 ft.Text("Satsang Vocabulary Decks",
                         size=FONT_SIZE_1,
                         weight=ft.FontWeight.BOLD,
-                        color=ft.Colors.BLACK,
+                        color=ft.colors.BLACK,
                         text_align=ft.TextAlign.CENTER)
         ]
         """
@@ -203,7 +203,7 @@ class Deck(ft.Column):
                     content=ft.Text(self.curr_word, size=FONT_SIZE_1),
                     padding=10,
                     alignment=ft.alignment.center,
-                    bgcolor=ft.Colors.AMBER_200,
+                    bgcolor=ft.colors.AMBER_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
@@ -213,10 +213,10 @@ class Deck(ft.Column):
                     "Click to see meaning",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.Colors.GREY_100,
+                    bgcolor=ft.colors.GREY_100,
                     icon="arrow_right_alt_rounded",
                     icon_color="grey500",
-                    color=ft.Colors.GREY_500,
+                    color=ft.colors.GREY_500,
                     on_click=self.show_meaning
                 ),
         ]
@@ -235,7 +235,7 @@ class Deck(ft.Column):
                     content=ft.Text(self.curr_word + "\n\n" + self.vocab[self.curr_word], size=FONT_SIZE_2),
                     padding=10,
                     alignment=ft.alignment.center,
-                    bgcolor=ft.Colors.LIGHT_BLUE_ACCENT_200,
+                    bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
@@ -245,20 +245,20 @@ class Deck(ft.Column):
                     "I knew this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.Colors.GREEN_100,
+                    bgcolor=ft.colors.GREEN_100,
                     icon="check_rounded",
                     icon_color="green500",
-                    color=ft.Colors.GREEN_500,
+                    color=ft.colors.GREEN_500,
                     on_click=lambda e: self.update_spaced_repetition(e, True)
                 ),
                 ft.ElevatedButton(
                     "I didn't know this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.Colors.RED_100,
+                    bgcolor=ft.colors.RED_100,
                     icon="cancel_rounded",
                     icon_color="red500",
-                    color=ft.Colors.RED_500,
+                    color=ft.colors.RED_500,
                     on_click=lambda e: self.update_spaced_repetition(e, False)
                 ),
         ]
@@ -280,9 +280,9 @@ class Deck(ft.Column):
             ]
 
         progress_bars = []
-        for text,k,color in [("have mastered", "Mastered", ft.Colors.GREEN_500),
-                             ("are reviewing", "Reviewing", ft.Colors.AMBER_500),
-                             ("are learning", "Learning", ft.Colors.RED_500)]:
+        for text,k,color in [("have mastered", "Mastered", ft.colors.GREEN_500),
+                             ("are reviewing", "Reviewing", ft.colors.AMBER_500),
+                             ("are learning", "Learning", ft.colors.RED_500)]:
             progress_bars.extend(progress_bar_factory(text, k, color))
         return progress_bars
 
@@ -356,11 +356,11 @@ class Orchestrator:
     def get_AppBar(self, route):
         # Actions
         if self.page.auth is None:
-            actions = [ft.IconButton(ft.Icons.WB_SUNNY_OUTLINED,
+            actions = [ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
                                      on_click=self.handle_login),
                       ]
         else:
-            actions = [ft.IconButton(ft.Icons.WB_SUNNY_ROUNDED,
+            actions = [ft.IconButton(ft.icons.WB_SUNNY_ROUNDED,
                                      on_click=self.handle_login),
                       ]
 
@@ -369,7 +369,7 @@ class Orchestrator:
             return ft.AppBar(title=ft.Text("Satsang Vocabulary Decks",
                                            size=FONT_SIZE_1,
                                            weight=ft.FontWeight.BOLD,
-                                           color=ft.Colors.BLACK,
+                                           color=ft.colors.BLACK,
                                            text_align=ft.TextAlign.CENTER),
                              center_title=True,
                              actions=actions)
@@ -378,7 +378,7 @@ class Orchestrator:
             return ft.AppBar(title=ft.Text(f"{deck_name}",
                                            size=FONT_SIZE_1,
                                            weight=ft.FontWeight.BOLD,
-                                           color=ft.Colors.BLACK,
+                                           color=ft.colors.BLACK,
                                            text_align=ft.TextAlign.CENTER),
                              center_title=True,
                              actions=actions)
@@ -400,7 +400,7 @@ class Orchestrator:
                         self.get_AppBar(self.page.route),
                         self.flashcard_app,
                     ],
-                    bgcolor=ft.Colors.PINK_100,
+                    bgcolor=ft.colors.PINK_100,
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 )
@@ -418,7 +418,7 @@ class Orchestrator:
                         self.get_AppBar(self.page.route),
                         deck,
                     ],
-                    bgcolor=ft.Colors.PINK_100,
+                    bgcolor=ft.colors.PINK_100,
                     #decoration=ft.BoxDecoration(image=ft.DecorationImage(src="/images/HD-wallpaper-abstract-blue-green-lime.jpg",
                     #                                                     fit=ft.ImageFit.COVER,
                     #                                                     opacity=1)),
