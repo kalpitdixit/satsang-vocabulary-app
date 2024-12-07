@@ -1,4 +1,6 @@
 import flet as ft
+from flet.auth.providers import Auth0OAuthProvider
+
 import random
 from collections import OrderedDict
 
@@ -309,7 +311,18 @@ class Orchestrator:
 
         self.page_props = {"width" : page.width,
                            "height" : page.height}
-    
+            
+        # OAuth
+        self.provider = Auth0OAuthProvider(
+            client_id="ioQ4UgajAgoAxz2PahBbeuSrs8zrLEu8",
+            client_secret="11M8ZGiC727PS75w8BBBOyKYx96-3UAMOYUqTj0dLnH5N77AYqO9NQOU_lEQVknV",
+            domain="dev-50q3lvc10l4nm2s1.us.auth0.com",
+            #redirect_url="http://localhost:8550/api/oauth/redirect"
+            redirect_url="http://localhost:8550/oauth_callback",
+        )
+        self.page.on_login = self.on_login
+
+        # Memory and Personalization
         self.state = {} # state
 
         self.flashcard_app = FlashCardApp(self, self.page_props, self.all_deck_names)
@@ -318,19 +331,47 @@ class Orchestrator:
     def start(self):
         self.page.go("/") # goes to route_chage(...)
 
-                            
+
+    def on_login(self, e):
+        print("Login error:", e.error)
+        print("Access token:", self.page.auth.token.access_token)
+        print("User ID:", self.page.auth.user.id)
+                       
+     
     def route_to(self, route):
         self.page.go(route)
 
 
-    def get_AppBar(self, route):
+    def handle_login(self, e):
+        print("handling login")
+        self.page.login(self.provider)
+        self.page.update()
 
-        if self.page.route[:6] == "/deck/":
+
+    def get_AppBar(self, route):
+        # Actions
+        if self.page.auth is None:
+            actions = [ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
+                                     on_click=self.handle_login),
+                      ]
+        else:
+            actions = [ft.IconButton(ft.icons.WB_SUNNY_ROUNDED,
+                                     on_click=self.handle_login),
+                      ]
+
+        # AppBar
+        if route=="/":
+            return ft.AppBar(title=ft.Text("All Decks"),
+                             center_title=True,
+                             actions=actions)
+        elif self.page.route[:6] == "/deck/":
             deck_name = self.page.route[6:]
             return ft.AppBar(title=ft.Text(f"{deck_name}"),
-                             center_title=True)
+                             center_title=True,
+                             actions=actions)
         else:
             return ft.AppBar()
+
 
     def route_change(self, route):
         print("ROUTE CHANGE", route)
@@ -343,7 +384,7 @@ class Orchestrator:
                 ft.View(
                     "/all_decks",
                     [
-                        self.get_AppBar(),
+                        self.get_AppBar(self.page.route),
                         self.flashcard_app,
                     ],
                     bgcolor=ft.colors.PINK_100,
@@ -361,7 +402,7 @@ class Orchestrator:
                 ft.View(
                     "/deck/{deck_name}",
                     [
-                        self.get_AppBar(route),
+                        self.get_AppBar(self.page.route),
                         deck,
                     ],
                     bgcolor=ft.colors.PINK_100,
@@ -404,8 +445,6 @@ def main(page: ft.Page):
         vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
 
     all_deck_names = list(vocabs.keys()) 
-
-
 
     # create application instance
     page_props = {"width" : page.width,
