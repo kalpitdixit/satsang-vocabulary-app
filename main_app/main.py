@@ -14,8 +14,8 @@ TEXT_BOX_HEIGHT_PERCENTAGE_3 = 10
 BUTTON_HEIGHT_PERCENTAGE = 5
 PROGRESS_BAR_HEIGHT_PERCENTAGE = 3
 
-PROGRESS_RING_HEIGHT_PERCENTAGE = 5
-PROGRESS_RING_WIDTH_PERCENTAGE = 5
+PROGRESS_RING_HEIGHT_PERCENTAGE = 10
+PROGRESS_RING_WIDTH_PERCENTAGE = 10
 
 VERTICAL_LINE_WIDTH_PERCENTAGE = 1
 
@@ -276,6 +276,7 @@ class Deck(ft.Column):
     def show_meaning(self, e):
 
         self.page.views[-1].bgcolor = "#a3e1c2"
+        self.page.views[-1][0].bgcolor = "#a3e1c2" # AppBar
         self.page.update()
 
         self.controls = [
@@ -402,50 +403,58 @@ class Deck(ft.Column):
 
         
         def progress_ring_factory(k):
-            return ft.ProgressRing(
+            progress_ring = ft.ProgressRing(
                     value=len(self.spaced_reps[k]) / self.num_words,
                     width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
                     bgcolor=ft.colors.GREY_100,
                     #color=color
                 )
-        
+
+            return ft.Stack(
+                    controls=[
+                        progress_ring,
+                        ft.Container(
+                            content=ft.Text(
+                                len(self.spaced_reps[k]),
+                                size=FONT_SIZE_3,
+                                weight=ft.FontWeight.BOLD,
+                            ),
+                            width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
+                            height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
+                            alignment=ft.alignment.center
+                        )
+                    ],
+                    width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
+                )
+
+         
         progress_bars = [ft.Container(
-                            ft.Column([
-                                ft.Row([
-                                    ft.Stack(
-                                        controls=[
-                                            progress_ring_factory("Mastered"),
-                                            ft.Container(
-                                                content=ft.Text(
-                                                    len(self.spaced_reps["Mastered"]),
-                                                    size=FONT_SIZE_3,
-                                                    weight=ft.FontWeight.BOLD,
-                                                ),
-                                                width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
-                                                height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
-                                                alignment=ft.alignment.center
-                                            )
-                                        ],
-                                        width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
-                                        height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
-                                    ),
-                                    progress_ring_factory("Reviewing"),
-                                    progress_ring_factory("Learning"),
-                                ],
-                                alignment=ft.MainAxisAlignment.SPACE_EVENLY
-                                ),
-                                ft.Row([
+                            ft.Row([
+                                ft.Column([
+                                    progress_ring_factory("Mastered"),
                                     ft.Text("Mastered",
                                             weight=ft.FontWeight.BOLD),
+                                    ]),
+                                ft.Column([
+                                    progress_ring_factory("Reviewing"),
                                     ft.Text("Reviewing",
                                             weight=ft.FontWeight.BOLD),
+                                    ]),
+                                ft.Column([
+                                    progress_ring_factory("Learning"),
                                     ft.Text("Learning",
                                             weight=ft.FontWeight.BOLD),
+                                    ]),
+                                ft.Column([
+                                    progress_ring_factory("Unseen"),
+                                    ft.Text("Unseen",
+                                            weight=ft.FontWeight.BOLD),
+                                    ]),
                                 ],
                                 alignment=ft.MainAxisAlignment.SPACE_EVENLY
                                 ),
-                            ]),
                             width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100,
                             ) 
                         ]
