@@ -687,7 +687,7 @@ def main(page: ft.Page):
 
     # All Decks
     decks = OrderedDict()
-    for fname in sorted(list(glob.glob(f"assets/decks/*txt"))):
+    for fname in sorted(list(glob.glob(f"decks/*txt"))):
         decks[os.path.basename(fname).strip(".txt")] = read_deck_txt(fname)
     print(decks)
    
