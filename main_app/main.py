@@ -205,6 +205,7 @@ class Deck(ft.Column):
         self.curr_word = self.curr_spaced_rep_obj.word
                   
         self.page.views[-1].bgcolor = "#edc343"  
+        self.page.views[-1].controls[0].bgcolor = "#edc343" # AppBar
         self.page.update()
 
         self.controls = [
@@ -276,7 +277,7 @@ class Deck(ft.Column):
     def show_meaning(self, e):
 
         self.page.views[-1].bgcolor = "#a3e1c2"
-        self.page.views[-1][0].bgcolor = "#a3e1c2" # AppBar
+        self.page.views[-1].controls[0].bgcolor = "#a3e1c2" # AppBar
         self.page.update()
 
         self.controls = [
@@ -430,7 +431,8 @@ class Deck(ft.Column):
                 )
 
          
-        progress_bars = [ft.Container(
+        progress_bars = [ft.Text("A", color=ft.colors.TRANSPARENT, size=FONT_SIZE_3),
+                         ft.Container(
                             ft.Row([
                                 ft.Column([
                                     progress_ring_factory("Mastered"),
@@ -583,6 +585,7 @@ class Orchestrator:
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 )
             )
+            self.page.views[-1].controls[0].bgcolor = "#f3c017" # AppBar
 
         # Show Deck
         if self.page.route[:6] == "/deck/":
@@ -604,6 +607,7 @@ class Orchestrator:
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 )
             )
+            self.page.views[-1].controls[0].bgcolor = "#edc343" # AppBar
 
         self.page.update()
 
