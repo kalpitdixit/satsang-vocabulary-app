@@ -1,6 +1,4 @@
 import flet as ft
-from flet.auth.providers import Auth0OAuthProvider
-
 import random
 from collections import OrderedDict
 
@@ -96,6 +94,7 @@ class FlashCardApp(ft.Column):
 
     def show_all_decks(self, e):
         def get_deck(title):
+            print("BREB", self.page is None)
             return ft.Column(
                     [
                         ft.Container(
@@ -193,15 +192,7 @@ class Deck(ft.Column):
 
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word,
-                                    style=ft.TextStyle(shadow=ft.BoxShadow(
-                                        spread_radius=1,
-                                        blur_radius=15,
-                                        color=ft.colors.GREY_700,
-                                        offset=ft.Offset(0, 0),
-                                        blur_style=ft.ShadowBlurStyle.OUTER,
-                                    )),
-                                    size=FONT_SIZE_1),
+                    content=ft.Text(self.curr_word, size=FONT_SIZE_1),
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.AMBER_200,
@@ -233,15 +224,7 @@ class Deck(ft.Column):
     def show_meaning(self, e):
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word + "\n\n" + self.vocab[self.curr_word],
-                                    style=ft.TextStyle(shadow=ft.BoxShadow(
-                                        spread_radius=1,
-                                        blur_radius=15,
-                                        color=ft.colors.GREY_700,
-                                        offset=ft.Offset(0, 0),
-                                        blur_style=ft.ShadowBlurStyle.OUTER,
-                                    )),
-                                    size=FONT_SIZE_2),
+                    content=ft.Text(self.curr_word + "\n\n" + self.vocab[self.curr_word], size=FONT_SIZE_2),
                     padding=10,
                     alignment=ft.alignment.center,
                     bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
@@ -323,63 +306,31 @@ class Orchestrator:
 
         self.page_props = {"width" : page.width,
                            "height" : page.height}
-   
-        # OAuth
-        self.provider = Auth0OAuthProvider(
-            client_id="ioQ4UgajAgoAxz2PahBbeuSrs8zrLEu8",
-            client_secret="11M8ZGiC727PS75w8BBBOyKYx96-3UAMOYUqTj0dLnH5N77AYqO9NQOU_lEQVknV",
-            domain="dev-50q3lvc10l4nm2s1.us.auth0.com",
-            #redirect_url="http://localhost:8550/api/oauth/redirect"
-            redirect_url="http://localhost:8550/oauth_callback",
-        )
-        self.page.on_login = self.on_login
-
-
-        # Memory and Personalization 
+    
         self.state = {} # state
 
         self.flashcard_app = FlashCardApp(self, self.page_props, self.all_deck_names)
 
 
     def start(self):
-        self.page.go("/all_decks") # goes to route_chage(...)
+        self.page.go("/") # goes to route_chage(...)
 
-
-    def on_login(self, e):
-        print("Login error:", e.error)
-        print("Access token:", self.page.auth.token.access_token)
-        print("User ID:", self.page.auth.user.id)
-        
                             
     def route_to(self, route):
         self.page.go(route)
 
 
-    def handle_login(self, e):
-        print("handling login")
-        self.page.login(self.provider)
-
-
     def route_change(self, route):
         print("ROUTE CHANGE", route)
-        print(self.page.auth)
-        if self.page.auth is not None:
-            print(self.page.auth.__dict__)
-            print(self.page.auth.user)
 
         self.page.controls.clear()
 
         # Show All Decks
-        if self.page.route=="/all_decks":
+        if self.page.route=="/":
             self.page.views.append(
                 ft.View(
                     "/all_decks",
                     [
-                        ft.AppBar(actions=[
-                                    ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
-                                                  on_click=self.handle_login,
-                                                 )
-                                ]),
                         self.flashcard_app,
                     ],
                     bgcolor=ft.colors.PINK_100,
@@ -439,9 +390,24 @@ def main(page: ft.Page):
     for k,v in vocabs.items():
         vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
 
+    all_deck_names = list(vocabs.keys()) 
+
+
+
+    # create application instance
+    page_props = {"width" : page.width,
+                  "height" : page.height}
+
+    # Objects
+    #flashcard_app = FlashCardApp(page, page_props, all_deck_names) # vocab, page_props)
+    #deck = Deck(vocab, page_props)
+
+    # add application's root control to the page
+    #page.go("/")
+
     # Orchestrator
     orchestrator = Orchestrator(page, vocabs)
     orchestrator.start()
 
 
-ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
+ft.app(target=main)
