@@ -1,5 +1,6 @@
 import flet as ft
-from flet.auth.providers import Auth0OAuthProvider
+#from flet.auth.providers import Auth0OAuthProvider
+from flet.auth.providers import GitHubOAuthProvider
 
 import random
 from collections import OrderedDict
