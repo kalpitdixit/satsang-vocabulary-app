@@ -1,19 +1,25 @@
 import flet as ft
-from flet.auth.providers import Auth0OAuthProvider
+#from flet.auth.providers import Auth0OAuthProvider
+#from flet.auth.providers import GitHubOAuthProvider
 
 import random
 from collections import OrderedDict
 
 
 TEXT_BOX_WIDTH_PERCENTAGE = 75
-TEXT_BOX_HEIGHT_PERCENTAGE_1 = 40
+TEXT_BOX_HEIGHT_PERCENTAGE_1 = 30
 TEXT_BOX_HEIGHT_PERCENTAGE_2 = 20
 TEXT_BOX_HEIGHT_PERCENTAGE_3 = 10
 
 BUTTON_HEIGHT_PERCENTAGE = 5
 PROGRESS_BAR_HEIGHT_PERCENTAGE = 3
 
-FONT_SIZE_1 = 30
+PROGRESS_RING_HEIGHT_PERCENTAGE = 5
+PROGRESS_RING_WIDTH_PERCENTAGE = 5
+
+VERTICAL_LINE_WIDTH_PERCENTAGE = 1
+
+FONT_SIZE_1 = 25
 FONT_SIZE_2 = 20
 FONT_SIZE_3 = 15
 
@@ -92,6 +98,10 @@ class FlashCardApp(ft.Column):
         # Utility
         self.first_display = True
         self.show_all_decks(None)
+    
+        # Alignment
+        self.alignment = ft.MainAxisAlignment.CENTER
+        self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
 
 
     def show_all_decks(self, e):
@@ -125,13 +135,15 @@ class FlashCardApp(ft.Column):
                     spacing=0,
                 )         
 
-        self.controls = [
+        self.controls = []
+        """
                 ft.Text("Satsang Vocabulary Decks",
                         size=FONT_SIZE_1,
                         weight=ft.FontWeight.BOLD,
                         color=ft.colors.BLACK,
                         text_align=ft.TextAlign.CENTER)
         ]
+        """
 
         # Add Decks
         for title in self.all_deck_names:
@@ -146,9 +158,10 @@ class FlashCardApp(ft.Column):
 
 
 class Deck(ft.Column):
-    def __init__(self, vocab, page_props):
+    def __init__(self, vocab, page, page_props):
         super().__init__()
         self.vocab = vocab
+        self.page = page
         self.page_props = page_props
         self.words = list(vocab.keys())
         self.num_words = len(self.words)
@@ -190,34 +203,64 @@ class Deck(ft.Column):
     def show_next_word(self, e):
         self.choose_next_word()
         self.curr_word = self.curr_spaced_rep_obj.word
+                  
+        self.page.views[-1].bgcolor = "#edc343"  
+        self.page.update()
 
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word,
-                                    style=ft.TextStyle(shadow=ft.BoxShadow(
-                                        spread_radius=1,
-                                        blur_radius=15,
-                                        color=ft.colors.GREY_700,
-                                        offset=ft.Offset(0, 0),
-                                        blur_style=ft.ShadowBlurStyle.OUTER,
-                                    )),
-                                    size=FONT_SIZE_1),
+                    content=ft.Row(
+                        [
+                        # Vertical bar
+                        ft.Container(
+                            width=self.page_props["width"] * VERTICAL_LINE_WIDTH_PERCENTAGE / 100, # "50vw",
+                            height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
+                            bgcolor=ft.colors.BLACK,
+                            margin=ft.margin.only(right=20)
+                        ),
+                        ft.Column(
+                            [
+                                ft.Container(
+                                    content=ft.Text(
+                                        self.curr_chosen_category,
+                                        size=FONT_SIZE_3,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.colors.BLACK,
+                                    ),
+                                    bgcolor="#fce5b2", # ft.colors.WHITE,
+                                    padding=ft.padding.symmetric(horizontal=10, vertical=8),
+                                    border_radius=20,
+                                ),
+                                ft.Text(self.curr_word,
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_1),
+                                ft.Text(self.vocab[self.curr_word][0],
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_1)
+                            ]
+                        )
+                    ]),
                     padding=10,
                     alignment=ft.alignment.center,
-                    bgcolor=ft.colors.AMBER_200,
+                    bgcolor=ft.colors.TRANSPARENT, # AMBER_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
                     ink=True,
                 ),
-                ft.ElevatedButton(
-                    "Click to see meaning",
+                ft.OutlinedButton(
+                    "Flip to see meaning",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.colors.GREY_100,
                     icon="arrow_right_alt_rounded",
-                    icon_color="grey500",
-                    color=ft.colors.GREY_500,
+                    icon_color="black", # "grey500",
+                    style=ft.ButtonStyle(
+                            color=ft.colors.BLACK,
+                            side=ft.BorderSide(
+                                color=ft.colors.BLACK,
+                                width=1,
+                                )
+                            ), # GREY_500,
                     on_click=self.show_meaning
                 ),
         ]
@@ -231,52 +274,113 @@ class Deck(ft.Column):
 
 
     def show_meaning(self, e):
+
+        self.page.views[-1].bgcolor = "#a3e1c2"
+        self.page.update()
+
         self.controls = [
                 ft.Container(
-                    content=ft.Text(self.curr_word + "\n\n" + self.vocab[self.curr_word],
-                                    style=ft.TextStyle(shadow=ft.BoxShadow(
-                                        spread_radius=1,
-                                        blur_radius=15,
-                                        color=ft.colors.GREY_700,
-                                        offset=ft.Offset(0, 0),
-                                        blur_style=ft.ShadowBlurStyle.OUTER,
-                                    )),
-                                    size=FONT_SIZE_2),
+                    content=ft.Row(
+                    [
+                        # Vertical bar
+                        ft.Container(
+                            width=self.page_props["width"] * VERTICAL_LINE_WIDTH_PERCENTAGE / 100, # "50vw",
+                            height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
+                            bgcolor=ft.colors.BLACK,
+                            margin=ft.margin.only(right=20)
+                        ),
+                        ft.Column(
+                            [
+                                ft.Container(
+                                    content=ft.Text(
+                                        self.curr_chosen_category,
+                                        size=FONT_SIZE_3,
+                                        weight=ft.FontWeight.BOLD,
+                                        color=ft.colors.BLACK,
+                                    ),
+                                    bgcolor="#d3f8e6", # "#fce5b2", # ft.colors.WHITE,
+                                    padding=ft.padding.symmetric(horizontal=10, vertical=8),
+                                    border_radius=20,
+                                ),
+                                ft.Text(self.curr_word,
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_2),
+                                ft.Text(self.vocab[self.curr_word][0],
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_2),
+                            ]
+                        )
+                    ]),
                     padding=10,
                     alignment=ft.alignment.center,
-                    bgcolor=ft.colors.LIGHT_BLUE_ACCENT_200,
+                    bgcolor=ft.colors.TRANSPARENT, # LIGHT_BLUE_ACCENT_200,
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
                     border_radius=10,
                     ink=True,
                 ),
-                ft.ElevatedButton(
+                ft.Container(
+                        content=ft.Text(self.vocab[self.curr_word][1],
+                                        font_family="Playfair Display Extra Bold",
+                                        size=FONT_SIZE_2),
+                    padding=10,
+                    alignment=ft.alignment.center,
+                    bgcolor=ft.colors.TRANSPARENT, # LIGHT_BLUE_ACCENT_200,
+                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_2 / 100, # "50vh",
+                    border_radius=10,
+                    ink=True,
+                ),
+                ft.OutlinedButton(
                     "I knew this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.colors.GREEN_100,
                     icon="check_rounded",
-                    icon_color="green500",
-                    color=ft.colors.GREEN_500,
+                    icon_color="green900",
+                    style=ft.ButtonStyle(
+                            color=ft.colors.GREEN_900,
+                            side=ft.BorderSide(
+                                color=ft.colors.BLACK,
+                                width=1,
+                                )
+                            ),
                     on_click=lambda e: self.update_spaced_repetition(e, True)
                 ),
-                ft.ElevatedButton(
+                ft.OutlinedButton(
                     "I didn't know this word",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    bgcolor=ft.colors.RED_100,
                     icon="cancel_rounded",
-                    icon_color="red500",
-                    color=ft.colors.RED_500,
+                    icon_color="red900",
+                    style=ft.ButtonStyle(
+                            color=ft.colors.RED_900,
+                            side=ft.BorderSide(
+                                color=ft.colors.BLACK,
+                                width=1,
+                                )
+                            ),
                     on_click=lambda e: self.update_spaced_repetition(e, False)
                 ),
         ]
+        """
+        ft.ElevatedButton(
+            "I didn't know this word",
+            width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+            height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
+            bgcolor="#d88073", # ft.colors.RED_100,
+            icon="cancel_rounded",
+            icon_color="red900",
+            color=ft.colors.RED_900,
+            on_click=lambda e: self.update_spaced_repetition(e, False)
+        ),
+        """
 
         self.controls.extend(self.get_progress_bars())
         self.update()
 
 
     def get_progress_bars(self):
+        """
         def progress_bar_factory(text, k, color):
             return [
                 ft.Text(f"You {text} {len(self.spaced_reps[k])} out of {self.num_words} words"),
@@ -293,6 +397,59 @@ class Deck(ft.Column):
                              ("are reviewing", "Reviewing", ft.colors.AMBER_500),
                              ("are learning", "Learning", ft.colors.RED_500)]:
             progress_bars.extend(progress_bar_factory(text, k, color))
+        """
+        
+
+        
+        def progress_ring_factory(k):
+            return ft.ProgressRing(
+                    value=len(self.spaced_reps[k]) / self.num_words,
+                    width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
+                    height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
+                    bgcolor=ft.colors.GREY_100,
+                    #color=color
+                )
+        
+        progress_bars = [ft.Container(
+                            ft.Column([
+                                ft.Row([
+                                    ft.Stack(
+                                        controls=[
+                                            progress_ring_factory("Mastered"),
+                                            ft.Container(
+                                                content=ft.Text(
+                                                    len(self.spaced_reps["Mastered"]),
+                                                    size=FONT_SIZE_3,
+                                                    weight=ft.FontWeight.BOLD,
+                                                ),
+                                                width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
+                                                height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
+                                                alignment=ft.alignment.center
+                                            )
+                                        ],
+                                        width=self.page_props["width"] * PROGRESS_RING_WIDTH_PERCENTAGE / 100, # "50vw",
+                                        height=self.page_props["width"] * PROGRESS_RING_HEIGHT_PERCENTAGE / 100, # "50vw",
+                                    ),
+                                    progress_ring_factory("Reviewing"),
+                                    progress_ring_factory("Learning"),
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_EVENLY
+                                ),
+                                ft.Row([
+                                    ft.Text("Mastered",
+                                            weight=ft.FontWeight.BOLD),
+                                    ft.Text("Reviewing",
+                                            weight=ft.FontWeight.BOLD),
+                                    ft.Text("Learning",
+                                            weight=ft.FontWeight.BOLD),
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_EVENLY
+                                ),
+                            ]),
+                            width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100,
+                            ) 
+                        ]
+
         return progress_bars
 
 
@@ -323,8 +480,9 @@ class Orchestrator:
 
         self.page_props = {"width" : page.width,
                            "height" : page.height}
-   
+            
         # OAuth
+        """
         self.provider = Auth0OAuthProvider(
             client_id="ioQ4UgajAgoAxz2PahBbeuSrs8zrLEu8",
             client_secret="11M8ZGiC727PS75w8BBBOyKYx96-3UAMOYUqTj0dLnH5N77AYqO9NQOU_lEQVknV",
@@ -332,10 +490,10 @@ class Orchestrator:
             #redirect_url="http://localhost:8550/api/oauth/redirect"
             redirect_url="http://localhost:8550/oauth_callback",
         )
+        """
         self.page.on_login = self.on_login
 
-
-        # Memory and Personalization 
+        # Memory and Personalization
         self.state = {} # state
 
         self.flashcard_app = FlashCardApp(self, self.page_props, self.all_deck_names)
@@ -349,8 +507,8 @@ class Orchestrator:
         print("Login error:", e.error)
         print("Access token:", self.page.auth.token.access_token)
         print("User ID:", self.page.auth.user.id)
-        
-                            
+                       
+     
     def route_to(self, route):
         self.page.go(route)
 
@@ -358,53 +516,47 @@ class Orchestrator:
     def handle_login(self, e):
         print("handling login")
         self.page.login(self.provider)
-
-
-    def handle_logout(self, e):
-        print("handling login")
-        self.page.logout()
-        print(self.page.auth)
-
-
-    def get_user_logo(self):
-        if self.page.auth is not None:
-            logo = self.page.auth.user["nickname"][:2]
-            logo = ft.Container(
-                    content=ft.Text(logo,
-                                    color=ft.colors.WHITE,
-                                    weight=ft.FontWeight.BOLD,
-                                    size=FONT_SIZE_3),
-                    #padding=10,
-                    #alignment=ft.alignment.center,
-                    bgcolor=ft.colors.BLUE_900,
-                    #width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    #height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
-                    border_radius=20,
-                   )
-        return logo            
+        self.page.update()
 
 
     def get_AppBar(self, route):
-        if route[:6] == "/deck/":
+        # Actions
+        """
+        if self.page.auth is None:
+            actions = [ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
+                                     on_click=self.handle_login),
+                      ]
+        else:
+            actions = [ft.IconButton(ft.icons.WB_SUNNY_ROUNDED,
+                                     on_click=self.handle_login),
+                      ]
+        """
+        actions = []
+
+        # AppBar
+        if route=="/":
+            return ft.AppBar(title=ft.Text("Satsang Vocabulary Decks",
+                                           size=FONT_SIZE_1,
+                                           weight=ft.FontWeight.BOLD,
+                                           color=ft.colors.BLACK,
+                                           text_align=ft.TextAlign.CENTER),
+                             center_title=True,
+                             actions=actions)
+        elif self.page.route[:6] == "/deck/":
             deck_name = self.page.route[6:]
-            if self.page.auth is not None: # if logged in
-                actions = [self.get_user_logo()]
-            else:
-                actions = []
-            app_bar = ft.AppBar(
-                        title=ft.Text(f"{deck_name}"),
-                        center_title=True,
-                        actions=actions
-                      )
-        return app_bar
+            return ft.AppBar(title=ft.Text(f"{deck_name}",
+                                           size=FONT_SIZE_1,
+                                           weight=ft.FontWeight.BOLD,
+                                           color=ft.colors.BLACK,
+                                           text_align=ft.TextAlign.CENTER),
+                             center_title=True,
+                             actions=actions)
+        else:
+            return ft.AppBar()
 
 
     def route_change(self, route):
         print("ROUTE CHANGE", route)
-        print(self.page.auth)
-        if self.page.auth is not None:
-            print(self.page.auth.__dict__)
-            print(self.page.auth.user)
 
         self.page.controls.clear()
 
@@ -414,14 +566,10 @@ class Orchestrator:
                 ft.View(
                     "/all_decks",
                     [
-                        #ft.AppBar(actions=[
-                        #            ft.IconButton(ft.icons.WB_SUNNY_OUTLINED,
-                        #                          on_click=self.handle_login,
-                        #                         )
-                        #        ]),
+                        self.get_AppBar(self.page.route),
                         self.flashcard_app,
                     ],
-                    bgcolor=ft.colors.PINK_100,
+                    bgcolor="#f3c017",
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 )
@@ -430,25 +578,8 @@ class Orchestrator:
         # Show Deck
         if self.page.route[:6] == "/deck/":
             deck_name = self.page.route[6:]
-            deck = Deck(self.vocabs[deck_name], self.page_props)
+            deck = Deck(self.vocabs[deck_name], self.page, self.page_props)
 
-            """
-              actions=[
-                    ft.PopupMenuButton(
-                        items=[
-                            ft.PopupMenuItem(
-                                content=ft.Row(
-                                    controls=[
-                                        ft.Icon(ft.icons.LOGOUT_ROUNDED),
-                                        ft.Text("Logout")
-                                    ]
-                                ),
-                                on_click=self.handle_logout
-                            )
-                        ]
-                    )
-                ]
-            """
             self.page.views.append(
                 ft.View(
                     "/deck/{deck_name}",
@@ -456,7 +587,7 @@ class Orchestrator:
                         self.get_AppBar(self.page.route),
                         deck,
                     ],
-                    bgcolor=ft.colors.PINK_100,
+                    bgcolor="#edc343",
                     #decoration=ft.BoxDecoration(image=ft.DecorationImage(src="/images/HD-wallpaper-abstract-blue-green-lime.jpg",
                     #                                                     fit=ft.ImageFit.COVER,
                     #                                                     opacity=1)),
@@ -481,23 +612,27 @@ def main(page: ft.Page):
     page.title = "Satsang Vocabulary App"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+
+    page.fonts = {"Roboto Condensed" : "RobotoCondensed-Regular.ttf",
+                  "Playfair Display Extra Bold" : "fonts/PlayfairDisplay-ExtraBold.ttf"}
+
+    page.theme = ft.Theme(font_family="Roboto Condensed")
+
     page.update()
 
     # All Decks
     vocabs = OrderedDict([
                 ("Beejam Kram I", {"રત્નત્રય" : ("ratnatray", "Samyak Darshan (Faith), Samyak Gnaan (Knowledge), Samyak Charitra (Conduct)"),
                                    "નય" : ("nay", "point of view, dimension"),
-                                   "ક્રુત્રિમ ": ("Krutrim", "Artificial"),
-                                   "નિર્મલ સમલ" : ("Nirmal, Samal", "without-impurities, with-impurities")}),
+                                   "ક્રુત્રિમ ": ("krutrim", "Artificial"),
+                                   "નિર્મલ સમલ" : ("nirmal, samal", "without-impurities, with-impurities")}),
                 ("Beejam Kram II", {"lorem" : ("ipsum", "dolor sit amet")})
              ])
 
-    for k,v in vocabs.items():
-        vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
+    #for k,v in vocabs.items():
+    #   vocabs[k] = dict([(f"{kk}  |  {vv[0]}", vv[1]) for kk,vv in v.items()])
 
     all_deck_names = list(vocabs.keys()) 
-
-
 
     # create application instance
     page_props = {"width" : page.width,
@@ -515,5 +650,6 @@ def main(page: ft.Page):
     orchestrator.start()
 
 
-ft.app(target=main)
+#ft.app(target=main)
+ft.app(target=main, assets_dir="assets")
 #ft.app(target=main, port=8550, view=ft.AppView.WEB_BROWSER)
