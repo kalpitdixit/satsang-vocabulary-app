@@ -380,7 +380,6 @@ class Deck(ft.Column):
 
 
     def get_progress_bars(self):
-        """
         def progress_bar_factory(text, k, color):
             return [
                 ft.Text(f"You {text} {len(self.spaced_reps[k])} out of {self.num_words} words"),
@@ -449,6 +448,7 @@ class Deck(ft.Column):
                             width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100,
                             ) 
                         ]
+        """
 
         return progress_bars
 
