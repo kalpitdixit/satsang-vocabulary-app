@@ -90,6 +90,10 @@ class FlashCardApp(ft.Column):
         # Utility
         self.first_display = True
         self.show_all_decks(None)
+    
+        # Alignment
+        self.alignment = ft.MainAxisAlignment.CENTER
+        self.horizontal_alignment = ft.CrossAxisAlignment.CENTER
 
 
     def show_all_decks(self, e):
@@ -319,6 +323,15 @@ class Orchestrator:
         self.page.go(route)
 
 
+    def get_AppBar(self, route):
+
+        if self.page.route[:6] == "/deck/":
+            deck_name = self.page.route[6:]
+            return ft.AppBar(title=ft.Text(f"{deck_name}"),
+                             center_title=True)
+        else:
+            return ft.AppBar()
+
     def route_change(self, route):
         print("ROUTE CHANGE", route)
 
@@ -330,6 +343,7 @@ class Orchestrator:
                 ft.View(
                     "/all_decks",
                     [
+                        self.get_AppBar(),
                         self.flashcard_app,
                     ],
                     bgcolor=ft.colors.PINK_100,
@@ -347,7 +361,7 @@ class Orchestrator:
                 ft.View(
                     "/deck/{deck_name}",
                     [
-                        ft.AppBar(title=ft.Text(f"{deck_name}"), center_title=True),
+                        self.get_AppBar(route),
                         deck,
                     ],
                     bgcolor=ft.colors.PINK_100,
