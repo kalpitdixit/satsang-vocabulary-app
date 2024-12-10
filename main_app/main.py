@@ -209,7 +209,10 @@ def main(page: ft.Page):
     page.title = "Satsang Vocabulary App"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.window_resizable = False
+    page.window.resizable = False
+
+    page.window.height = 886 # 2532
+    page.window.width = 410 # 1170
 
     page.fonts = {"Roboto Condensed" : "RobotoCondensed-Regular.ttf",
                   "Playfair Display Extra Bold" : "fonts/PlayfairDisplay-ExtraBold.ttf"}

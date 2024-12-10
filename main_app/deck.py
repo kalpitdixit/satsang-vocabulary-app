@@ -126,13 +126,12 @@ class Deck(ft.Column):
                     on_click=self.show_meaning
                 )
 
-        # Progress Rings
+        # Progress
         self.control_dict["progress"].content = ft.Column(
                                                     controls=self.get_progress_bars()
                                                 )
 
         self.controls = [v for _,v in self.control_dict.items()]
-        print(self.controls)
 
         if not self.first_display:
             self.update()
@@ -146,10 +145,10 @@ class Deck(ft.Column):
         self.page.views[-1].controls[0].bgcolor = "#a3e1c2" # AppBar
         self.page.update()
 
-        self.controls = [
-                ft.Container(
-                    content=ft.Row(
-                    [
+
+        # Main Text
+        self.control_dict["main_text"].content = ft.Column([
+                    ft.Row([
                         # Vertical bar
                         ft.Container(
                             width=self.page_props["width"] * VERTICAL_LINE_WIDTH_PERCENTAGE / 100, # "50vw",
@@ -177,73 +176,65 @@ class Deck(ft.Column):
                                         font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_2),
                             ]
-                        )
+                        ),
                     ]),
-                    padding=10,
-                    alignment=ft.alignment.center,
-                    bgcolor=ft.colors.TRANSPARENT, # LIGHT_BLUE_ACCENT_200,
-                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
-                    border_radius=10,
-                    ink=True,
-                ),
-                ft.Container(
-                        content=ft.Text(self.deck[self.curr_word][1],
-                                        color=ft.colors.BLACK,
-                                        size=FONT_SIZE_2),
-                    padding=10,
-                    alignment=ft.alignment.center,
-                    bgcolor=ft.colors.TRANSPARENT, # LIGHT_BLUE_ACCENT_200,
-                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_2 / 100, # "50vh",
-                    border_radius=10,
-                    ink=True,
-                ),
-                ft.OutlinedButton(
-                    "I knew this word",
-                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    icon="check_rounded",
-                    icon_color="green900",
-                    style=ft.ButtonStyle(
-                            color=ft.colors.GREEN_900,
-                            side=ft.BorderSide(
-                                color=ft.colors.BLACK,
-                                width=1,
-                                )
-                            ),
-                    on_click=lambda e: self.update_spaced_repetition(e, True)
-                ),
-                ft.OutlinedButton(
-                    "I didn't know this word",
-                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-                    icon="cancel_rounded",
-                    icon_color="red900",
-                    style=ft.ButtonStyle(
-                            color=ft.colors.RED_900,
-                            side=ft.BorderSide(
-                                color=ft.colors.BLACK,
-                                width=1,
-                                )
-                            ),
-                    on_click=lambda e: self.update_spaced_repetition(e, False)
-                ),
-        ]
-        """
-        ft.ElevatedButton(
-            "I didn't know this word",
-            width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-            height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
-            bgcolor="#d88073", # ft.colors.RED_100,
-            icon="cancel_rounded",
-            icon_color="red900",
-            color=ft.colors.RED_900,
-            on_click=lambda e: self.update_spaced_repetition(e, False)
-        ),
-        """
+                    ft.Container(
+                            content=ft.Text(self.deck[self.curr_word][1],
+                                            color=ft.colors.BLACK,
+                                            size=FONT_SIZE_2),
+                        padding=10,
+                        alignment=ft.alignment.center,
+                        bgcolor=ft.colors.TRANSPARENT, # LIGHT_BLUE_ACCENT_200,
+                        width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                        height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_2 / 100, # "50vh",
+                        border_radius=10,
+                        ink=True,
+                    ),
+                ])
 
-        self.controls.extend(self.get_progress_bars())
+        # Buttons
+        self.control_dict["buttons"].content = ft.Column(
+                controls = [
+                    ft.OutlinedButton(
+                        "I knew this word",
+                        width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                        height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
+                        icon="check_rounded",
+                        icon_color="green900",
+                        style=ft.ButtonStyle(
+                                color=ft.colors.GREEN_900,
+                                side=ft.BorderSide(
+                                    color=ft.colors.BLACK,
+                                    width=1,
+                                    )
+                                ),
+                        on_click=lambda e: self.update_spaced_repetition(e, True)
+                    ),
+                    ft.OutlinedButton(
+                        "I didn't know this word",
+                        width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                        height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
+                        icon="cancel_rounded",
+                        icon_color="red900",
+                        style=ft.ButtonStyle(
+                                color=ft.colors.RED_900,
+                                side=ft.BorderSide(
+                                    color=ft.colors.BLACK,
+                                    width=1,
+                                    )
+                                ),
+                        on_click=lambda e: self.update_spaced_repetition(e, False)
+                    ),
+                ]
+        )
+
+        # Progress
+        self.control_dict["progress"].content = ft.Column(
+                                                    controls=self.get_progress_bars()
+                                                )
+
+        self.controls = [v for _,v in self.control_dict.items()]
+
         self.update()
 
 
