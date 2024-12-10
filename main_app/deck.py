@@ -1,4 +1,5 @@
 import random
+from collections import OrderedDict
 
 import flet as ft
 
@@ -24,9 +25,26 @@ class Deck(ft.Column):
                             "Reviewing": [],
                             "Mastered": []}
 
+        # Display - the individual functions can simply change the "content" property of these Containers
+        def get_empty_control_dict_container(height_percentage):
+            return ft.Container(
+                        width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
+                        height=self.page_props["height"] * (1 - APP_BAR_HEIGHT_PERCENTAGE / 100) * \
+                               height_percentage / 100,
+                        alignment=ft.alignment.center,
+                        bgcolor=ft.colors.TRANSPARENT,
+                        )
+
+        self.control_dict = OrderedDict([
+            ("main_text", get_empty_control_dict_container(70)),
+            ("buttons", get_empty_control_dict_container(15)),
+            ("progress", get_empty_control_dict_container(15)),
+        ])
+        
         # Utility
         self.first_display = True
         self.show_next_word(None)
+
 
 
     def choose_next_word(self):
@@ -58,10 +76,8 @@ class Deck(ft.Column):
         self.page.views[-1].controls[0].bgcolor = "#edc343" # AppBar
         self.page.update()
 
-        self.controls = [
-                ft.Container(
-                    content=ft.Row(
-                        [
+        # Main Text
+        self.control_dict["main_text"].content = ft.Row([
                         # Vertical bar
                         ft.Container(
                             width=self.page_props["width"] * VERTICAL_LINE_WIDTH_PERCENTAGE / 100, # "50vw",
@@ -88,18 +104,13 @@ class Deck(ft.Column):
                                 ft.Text(self.deck[self.curr_word][0],
                                         font_family="Playfair Display Extra Bold",
                                         size=FONT_SIZE_1)
-                            ]
+                            ],
+                            scroll=ft.ScrollMode.AUTO,
                         )
-                    ]),
-                    padding=10,
-                    alignment=ft.alignment.center,
-                    bgcolor=ft.colors.TRANSPARENT, # AMBER_200,
-                    width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
-                    height=self.page_props["height"] * TEXT_BOX_HEIGHT_PERCENTAGE_1 / 100, # "50vh",
-                    border_radius=10,
-                    ink=True,
-                ),
-                ft.OutlinedButton(
+                    ])
+
+        # Buttons
+        self.control_dict["buttons"].content = ft.OutlinedButton(
                     "Flip to see meaning",
                     width=self.page_props["width"] * TEXT_BOX_WIDTH_PERCENTAGE / 100, # "50vw",
                     height=self.page_props["height"] * BUTTON_HEIGHT_PERCENTAGE / 100, # "50vh",
@@ -113,10 +124,15 @@ class Deck(ft.Column):
                                 )
                             ), # GREY_500,
                     on_click=self.show_meaning
-                ),
-        ]
+                )
 
-        self.controls.extend(self.get_progress_bars())
+        # Progress Rings
+        self.control_dict["progress"].content = ft.Column(
+                                                    controls=self.get_progress_bars()
+                                                )
+
+        self.controls = [v for _,v in self.control_dict.items()]
+        print(self.controls)
 
         if not self.first_display:
             self.update()

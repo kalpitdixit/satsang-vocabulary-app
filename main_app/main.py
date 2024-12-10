@@ -86,7 +86,8 @@ class Orchestrator:
                                            color=ft.colors.BLACK,
                                            text_align=ft.TextAlign.CENTER),
                              center_title=True,
-                             actions=actions)
+                             actions=actions,
+                             toolbar_height=self.page_props["height"] * APP_BAR_HEIGHT_PERCENTAGE / 100)
         elif self.page.route[:6] == "/deck/":
             deck_name = self.page.route[6:]
             return ft.AppBar(title=ft.Text(f"{deck_name}",
@@ -95,9 +96,12 @@ class Orchestrator:
                                            color=ft.colors.BLACK,
                                            text_align=ft.TextAlign.CENTER),
                              center_title=True,
-                             actions=actions)
+                             actions=actions,
+                             toolbar_height=self.page_props["height"] * APP_BAR_HEIGHT_PERCENTAGE / 100)
         else:
-            return ft.AppBar()
+            return ft.AppBar(
+                             toolbar_height=self.page_props["height"] * APP_BAR_HEIGHT_PERCENTAGE / 100
+                            )
 
 
     def route_change(self, route):
@@ -205,6 +209,7 @@ def main(page: ft.Page):
     page.title = "Satsang Vocabulary App"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+    page.window_resizable = False
 
     page.fonts = {"Roboto Condensed" : "RobotoCondensed-Regular.ttf",
                   "Playfair Display Extra Bold" : "fonts/PlayfairDisplay-ExtraBold.ttf"}
