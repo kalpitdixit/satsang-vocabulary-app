@@ -3,6 +3,7 @@ import flet as ft
 import random
 import glob
 from collections import OrderedDict
+from authlib.integrations.requests_client import OAuth2Session
 
 #from flet.auth.providers import Auth0OAuthProvider
 
